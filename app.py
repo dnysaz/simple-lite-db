@@ -145,13 +145,16 @@ async def admin_create_db(req: CreateDbRequest, authorization: Optional[str] = H
 async def get_dashboard():
     # Use absolute path to ensure the file is found
     base_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_path, "dashboard.html")
+    file_path = os.path.join(base_path, "index.html")
     
     if not os.path.exists(file_path):
-        return HTMLResponse(content=f"<h1>Error: dashboard.html not found at {file_path}</h1>", status_code=404)
+        return HTMLResponse(content=f"<h1>Error: index.html not found at {file_path}</h1>", status_code=404)
         
     with open(file_path, "r") as f:
         return f.read()
+
+# Mount folder assets
+app.mount("/html", StaticFiles(directory="html"), name="html")
 
 @app.get("/")
 async def health_check():
