@@ -76,6 +76,19 @@ async def query(
             "error": str(e)
         }
 
+@app.get("/dashboard", response_class=HTMLResponse)
+@app.get("/dashboard/", response_class=HTMLResponse)
+async def get_dashboard():
+    # Use absolute path to ensure the file is found
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path, "dashboard.html")
+    
+    if not os.path.exists(file_path):
+        return HTMLResponse(content=f"<h1>Error: dashboard.html not found at {file_path}</h1>", status_code=404)
+        
+    with open(file_path, "r") as f:
+        return f.read()
+
 @app.get("/")
 async def health_check():
     return {"status": "online", "message": "SimpleLiteDB is running"}
