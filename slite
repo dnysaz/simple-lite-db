@@ -24,7 +24,7 @@ if [ "$COMMAND" == "start" ] && [ "$SUBCOMMAND" == "db" ]; then
         exit 1
     fi
     echo "🚀 Starting SimpleLiteDB Service on port $PORT..."
-    nohup uvicorn app:app --host 0.0.0.0 --port $PORT > $LOG_FILE 2>&1 &
+    nohup python3 -m uvicorn app:app --host 0.0.0.0 --port $PORT > $LOG_FILE 2>&1 &
     echo $! > $PID_FILE
     echo "✅ Started. Logs are in $LOG_FILE. PID: $(cat $PID_FILE)"
 
