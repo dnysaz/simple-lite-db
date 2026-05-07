@@ -90,6 +90,56 @@ async def login(req: LoginRequest):
         return {"success": True, "token": dash_pass} # Simple token for now
     return {"success": False, "detail": "Invalid IP (Username) or Password"}
 
+# --- ADMIN ENDPOINTS (Requires Dashboard Token) ---
+
+@app.get("/admin/databases")
+async def admin_list_databases(authorization: Optional[str] = Header(None)):
+    if authorization != f"Bearer {os.getenv('DASHBOARD_PASS')}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    databases = []
+    if os.path.exists("data"):
+        for file in os.listdir("data"):
+            if file.endswith(".db"):
+                name = file.replace(".db", "")
+                # Cari API key di .env
+                env_key = f"KEY_{name.upper().replace('-', '_')}"
+                api_key = os.getenv(env_key, "No Key Found")
+                databases.append({"name": name, "api_key": api_key})
+    return {"success": True, "databases": databases}
+
+class CreateDbRequest(BaseModel):
+    name: str
+
+@app.post("/admin/create_db")
+async def admin_create_db(req: CreateDbRequest, authorization: Optional[str] = Header(None)):
+    if authorization != f"Bearer {os.getenv('DASHBOARD_PASS')}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    # Logic creation (minimalist version of slite create db)
+    import secrets
+    import string
+    
+    db_name = req.name.strip().lower()
+    if not db_name: return {"success": False, "error": "Invalid name"}
+    
+    db_path = f"data/{db_name}.db"
+    if os.path.exists(db_path): return {"success": False, "error": "Database already exists"}
+    
+    # Generate API key
+    api_key = "".join(secrets.choice(string.ascii_letters + string.digits + "_-") for _ in range(43))
+    env_key = f"KEY_{db_name.upper().replace('-', '_')}"
+    
+    # Save to .env
+    with open(".env", "a") as f:
+        f.write(f"\n{env_key}={api_key}")
+    
+    # Create empty db
+    import sqlite3
+    sqlite3.connect(db_path).close()
+    
+    return {"success": True, "name": db_name, "api_key": api_key}
+
 @app.get("/dashboard", response_class=HTMLResponse)
 @app.get("/dashboard/", response_class=HTMLResponse)
 async def get_dashboard():
