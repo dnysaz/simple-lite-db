@@ -172,91 +172,104 @@ function showApiInfo() {
     el('apiContent').innerHTML = `
         <!-- Credentials Card -->
         <div class="grid grid-cols-1 gap-3">
-            <div class="p-4 bg-slate-900 rounded-md text-white border-l-4 border-indigo-500">
-                <div class="flex flex-col gap-2">
+            <div class="p-6 bg-slate-900 rounded-lg text-white border-l-4 border-indigo-500 shadow-lg">
+                <div class="flex flex-col gap-3">
                     <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-slate-400 text-[10px] uppercase font-bold">API Endpoint</span>
-                        <span class="text-xs font-mono select-all">${baseUrl}/query</span>
+                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">API Endpoint</span>
+                        <span class="text-xs font-mono select-all text-indigo-300">${baseUrl}/query</span>
                     </div>
                     <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-slate-400 text-[10px] uppercase font-bold">Database Name</span>
-                        <span class="text-xs font-mono text-indigo-300 select-all">${db}</span>
+                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Database</span>
+                        <span class="text-xs font-mono text-emerald-400 select-all">${db}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-400 text-[10px] uppercase font-bold">API Key</span>
-                        <span class="text-xs font-mono text-emerald-400 select-all">${apiKey}</span>
+                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Authorization</span>
+                        <span class="text-xs font-mono text-amber-400 select-all">Bearer ${apiKey}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="space-y-6 mt-6">
-            <h4 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Implementation Examples</h4>
+        <div class="space-y-6 mt-8">
+            <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 border-b border-slate-100 pb-2">Implementation Examples</h4>
             
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Vanilla JS -->
                 <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-500">VANILLA JAVASCRIPT / BROWSER</p>
-                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">fetch('${baseUrl}/query', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ${apiKey}'
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">JavaScript (Fetch)</p>
+                    </div>
+                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-pink-400">fetch</span>(<span class="text-amber-300">'${baseUrl}/query'</span>, {
+  <span class="text-slate-400">method</span>: <span class="text-amber-300">'POST'</span>,
+  <span class="text-slate-400">headers</span>: {
+    <span class="text-amber-300">'Content-Type'</span>: <span class="text-amber-300">'application/json'</span>,
+    <span class="text-amber-300">'Authorization'</span>: <span class="text-amber-300">'Bearer ${apiKey}'</span>
   },
-  body: JSON.stringify({
-    database: '${db}',
-    sql: 'SELECT * FROM ${table}'
+  <span class="text-slate-400">body</span>: <span class="text-cyan-400">JSON</span>.<span class="text-pink-400">stringify</span>({
+    <span class="text-slate-400">database</span>: <span class="text-amber-300">'${db}'</span>,
+    <span class="text-slate-400">sql</span>: <span class="text-amber-300">'SELECT * FROM ${table}'</span>
   })
-}).then(res => res.json()).then(console.log);</pre>
+}).<span class="text-pink-400">then</span>(res => res.<span class="text-pink-400">json</span>())
+  .<span class="text-pink-400">then</span>(<span class="text-cyan-400">console</span>.<span class="text-pink-400">log</span>);</pre>
                 </div>
 
                 <!-- Next.js -->
                 <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-500">NEXT.JS (SERVER ACTION / API)</p>
-                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">const res = await fetch('${baseUrl}/query', {
-  method: 'POST',
-  headers: {
-    'Authorization': \`Bearer $\{process.env.SLITE_API_KEY\}\`,
-    'Content-Type': 'application/json'
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-slate-900"></span>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">Next.js (Server Side)</p>
+                    </div>
+                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-purple-400">const</span> res = <span class="text-purple-400">await</span> <span class="text-pink-400">fetch</span>(<span class="text-amber-300">'${baseUrl}/query'</span>, {
+  <span class="text-slate-400">method</span>: <span class="text-amber-300">'POST'</span>,
+  <span class="text-slate-400">headers</span>: {
+    <span class="text-amber-300">'Authorization'</span>: <span class="text-amber-300">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
+    <span class="text-amber-300">'Content-Type'</span>: <span class="text-amber-300">'application/json'</span>
   },
-  body: JSON.stringify({
-    database: '${db}',
-    sql: 'SELECT * FROM ${table}'
+  <span class="text-slate-400">body</span>: <span class="text-cyan-400">JSON</span>.<span class="text-pink-400">stringify</span>({
+    <span class="text-slate-400">database</span>: <span class="text-amber-300">'${db}'</span>,
+    <span class="text-slate-400">sql</span>: <span class="text-amber-300">'SELECT * FROM ${table}'</span>
   }),
-  cache: 'no-store'
+  <span class="text-slate-400">cache</span>: <span class="text-amber-300">'no-store'</span>
 });
-const data = await res.json();</pre>
+<span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> res.<span class="text-pink-400">json</span>();</pre>
                 </div>
 
                 <!-- PHP -->
                 <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-500">PHP (CURL)</p>
-                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">$ch = curl_init('${baseUrl}/query');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'database' => '${db}',
-    'sql' => 'SELECT * FROM ${table}'
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">PHP (cURL)</p>
+                    </div>
+                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-indigo-300">$ch</span> = <span class="text-pink-400">curl_init</span>(<span class="text-amber-300">'${baseUrl}/query'</span>);
+<span class="text-pink-400">curl_setopt</span>(<span class="text-indigo-300">$ch</span>, <span class="text-cyan-400">CURLOPT_RETURNTRANSFER</span>, <span class="text-emerald-400">true</span>);
+<span class="text-pink-400">curl_setopt</span>(<span class="text-indigo-300">$ch</span>, <span class="text-cyan-400">CURLOPT_POSTFIELDS</span>, <span class="text-pink-400">json_encode</span>([
+    <span class="text-amber-300">'database'</span> => <span class="text-amber-300">'${db}'</span>,
+    <span class="text-amber-300">'sql'</span> => <span class="text-amber-300">'SELECT * FROM ${table}'</span>
 ]));
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ${apiKey}',
-    'Content-Type: application/json'
+<span class="text-pink-400">curl_setopt</span>(<span class="text-indigo-300">$ch</span>, <span class="text-cyan-400">CURLOPT_HTTPHEADER</span>, [
+    <span class="text-amber-300">'Authorization: Bearer ${apiKey}'</span>,
+    <span class="text-amber-300">'Content-Type: application/json'</span>
 ]);
-$response = curl_exec($ch);</pre>
+<span class="text-indigo-300">$response</span> = <span class="text-pink-400">curl_exec</span>(<span class="text-indigo-300">$ch</span>);</pre>
                 </div>
 
                 <!-- Python -->
                 <div class="space-y-2">
-                    <p class="text-[10px] font-bold text-slate-500">PYTHON (REQUESTS)</p>
-                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">import requests
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">Python (Requests)</p>
+                    </div>
+                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-purple-400">import</span> requests
 
-res = requests.post('${baseUrl}/query', 
-    headers={'Authorization': 'Bearer ${apiKey}'},
-    json={
-        'database': '${db}',
-        'sql': 'SELECT * FROM ${table}'
+res = requests.<span class="text-pink-400">post</span>(<span class="text-amber-300">'${baseUrl}/query'</span>, 
+    <span class="text-slate-400">headers</span>={<span class="text-amber-300">'Authorization'</span>: <span class="text-amber-300">'Bearer ${apiKey}'</span>},
+    <span class="text-slate-400">json</span>={
+        <span class="text-amber-300">'database'</span>: <span class="text-amber-300">'${db}'</span>,
+        <span class="text-amber-300">'sql'</span>: <span class="text-amber-300">'SELECT * FROM ${table}'</span>
     }
 )
-print(res.json())</pre>
+<span class="text-pink-400">print</span>(res.<span class="text-pink-400">json</span>())</pre>
                 </div>
             </div>
         </div>
