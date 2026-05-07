@@ -14,6 +14,7 @@ KEYS_FILE=".keys.json"
 mkdir -p data
 
 # Konfigurasi Port (Default: 5117, bisa diubah di .env)
+# 2>/dev/null agar tidak error jika .env belum ada
 PORT=$(grep "PORT=" .env 2>/dev/null | cut -d'=' -f2)
 PORT=${PORT:-5117}
 
@@ -59,8 +60,9 @@ elif [ "$COMMAND" == "create" ] && [ "$SUBCOMMAND" == "db" ]; then
     if [ "$OPTION" == "--api" ]; then
         NEW_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
         
-        # Simpan key ke .env dengan format KEY_DBNAME
-        ENV_VAR="KEY_${DB_NAME^^}" # Uppercase DB name
+        # Simpan key ke .env dengan format KEY_DBNAME (Compatible uppercase)
+        DB_UPPER=$(echo "$DB_NAME" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+        ENV_VAR="KEY_$DB_UPPER"
         
         if [ -f ".env" ]; then
             if grep -q "$ENV_VAR=" .env; then
@@ -119,7 +121,8 @@ elif [ "$COMMAND" == "delete" ]; then
         [ -f "data/$DB_NAME.db-wal" ] && rm "data/$DB_NAME.db-wal"
         
         # Hapus API Key dari .env (Compatible with macOS and Linux)
-        ENV_VAR="KEY_${DB_NAME^^}"
+        DB_UPPER=$(echo "$DB_NAME" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+        ENV_VAR="KEY_$DB_UPPER"
         if [ -f ".env" ]; then
             if [[ "$OSTYPE" == "darwin"* ]]; then
                 sed -i '' "/$ENV_VAR=/d" .env

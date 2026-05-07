@@ -2,6 +2,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from typing import List, Any, Optional
 import os
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from database import execute
@@ -10,6 +11,15 @@ from database import execute
 load_dotenv()
 
 app = FastAPI(title="SimpleLiteDB HTTP Service")
+
+# Aktifkan CORS agar bisa dipanggil dari Vanilla JS/Browser
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class QueryRequest(BaseModel):
     database: str
