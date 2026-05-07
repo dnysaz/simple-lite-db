@@ -81,10 +81,17 @@ elif [ "$COMMAND" == "create" ] && [ "$SUBCOMMAND" == "db" ]; then
         # Deteksi IP Publik otomatis
         PUBLIC_IP=$(curl -s https://ifconfig.me || echo "YOUR_VPS_IP")
         
+        # Jika IPv6, bungkus dengan kurung siku [] untuk URL yang valid
+        if [[ $PUBLIC_IP == *":"* ]]; then
+            URL_IP="[$PUBLIC_IP]"
+        else
+            URL_IP="$PUBLIC_IP"
+        fi
+        
         echo ""
         echo "✨ Project Ready!"
         echo "--------------------------"
-        echo "slite_url      : http://$PUBLIC_IP:$PORT"
+        echo "slite_url      : http://$URL_IP:$PORT"
         echo "slite_db_name  : $DB_NAME"
         echo "slite_api_key  : $NEW_KEY"
         echo "--------------------------"
