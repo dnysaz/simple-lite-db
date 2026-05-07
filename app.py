@@ -157,6 +157,11 @@ async def get_dashboard():
 # Mount folder assets
 app.mount("/html", StaticFiles(directory="html"), name="html")
 
-@app.get("/")
-async def health_check():
-    return {"status": "online", "message": "SimpleLiteDB is running"}
+@app.get("/", response_class=HTMLResponse)
+async def get_root_dashboard():
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path, "index.html")
+    if not os.path.exists(file_path):
+        return HTMLResponse(content="<h1>index.html not found</h1>", status_code=404)
+    with open(file_path, "r") as f:
+        return f.read()
