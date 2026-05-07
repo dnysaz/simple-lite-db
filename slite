@@ -181,6 +181,21 @@ elif [ "$COMMAND" == "init" ]; then
         echo "⚠️  UFW not found. Please ensure port $PORT is open manually."
     fi
 
+    # 4. Dashboard Security Setup
+    PUBLIC_IP=$(curl -s https://api.ipify.org || echo "YOUR_VPS_IP")
+    echo "🔐 Setting up Dashboard Security..."
+    echo -n "Enter a password for your Dashboard: "
+    read -s DASH_PASS
+    echo ""
+    
+    if [ -f ".env" ]; then
+        # Gunakan perl untuk cross-platform sed (Mac vs Linux)
+        perl -i -pe "s/^DASHBOARD_USER=.*$//g" .env
+        perl -i -pe "s/^DASHBOARD_PASS=.*$//g" .env
+    fi
+    echo "DASHBOARD_USER=$PUBLIC_IP" >> .env
+    echo "DASHBOARD_PASS=$DASH_PASS" >> .env
+
     echo "✅ SimpleLiteDB is ready! Run: ./slite start db"
 
 elif [ "$COMMAND" == "list" ] && [ "$SUBCOMMAND" == "db" ]; then
