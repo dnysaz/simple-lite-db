@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="/html/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="h-screen flex flex-col bg-[#F1F5F9] text-slate-700 overflow-hidden text-[12px] font-inter">
+<body class="h-screen flex flex-col bg-[#fcfcfc] text-slate-700 overflow-hidden text-[13px] font-inter">
 
     <!-- Script to Check Auth immediately -->
     <script>
@@ -18,225 +18,174 @@
     </script>
 
     <!-- Main Header -->
-    <header class="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10">
+    <header class="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-6 shrink-0 z-10">
         <div class="flex items-center gap-8 h-full">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-[#3ecf8e] rounded-md flex items-center justify-center text-[#052e16] font-bold shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 bg-[#3ecf8e] rounded flex items-center justify-center text-white font-bold">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 </div>
-                <span class="font-bold text-slate-900 text-base tracking-tight">SimpleLiteDB</span>
+                <span class="font-bold text-slate-900 text-sm tracking-tight">SimpleLiteDB</span>
             </div>
-            <nav class="flex items-center gap-2">
-                <button onclick="switchView('view-welcome')" class="nav-link active">Dashboard</button>
+            <nav class="flex items-center gap-1">
+                <button onclick="switchView('view-welcome')" class="nav-link active">Overview</button>
                 <button onclick="showSqlTab()" class="nav-link">SQL Editor</button>
                 <button class="nav-link">Settings</button>
             </nav>
         </div>
         <div class="flex items-center gap-4">
-            <div id="userDisplay" class="text-[12px] font-semibold text-slate-600 bg-slate-100 px-3 py-1 rounded-full"></div>
-            <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <div id="userDisplay" class="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1 rounded-md"></div>
+            <button onclick="logout()" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-md">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
         </div>
     </header>
 
     <div class="flex-1 flex overflow-hidden">
-        <!-- Sidebar Explorer -->
-        <aside class="w-64 sidebar flex flex-col shrink-0 border-r border-white/5">
-            <div class="p-4 flex items-center justify-between">
-                <span class="text-[11px] font-bold uppercase tracking-widest text-slate-500">Explorer</span>
-                <button onclick="showCreateDb()" class="w-6 h-6 flex items-center justify-center rounded bg-slate-800 hover:bg-slate-700 text-white transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <!-- Sidebar Explorer (Light Theme) -->
+        <aside class="w-64 sidebar flex flex-col shrink-0">
+            <div class="p-4 flex items-center justify-between border-b border-slate-50 mb-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">All Databases</span>
+                <button onclick="showCreateDb()" class="w-5 h-5 flex items-center justify-center rounded border border-slate-200 hover:border-slate-400 text-slate-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
             </div>
-            <div id="sidebarContent" class="flex-1 overflow-y-auto custom-scrollbar py-2">
+            <div id="sidebarContent" class="flex-1 overflow-y-auto custom-scrollbar">
                 <!-- DB Tree injected here -->
             </div>
-            <div class="p-4 border-t border-white/5">
-                <div class="bg-slate-800/50 rounded-lg p-3">
-                    <p class="text-[10px] text-slate-500 font-medium uppercase mb-1">Status</p>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-[#3ecf8e] animate-pulse"></span>
-                        <span class="text-[11px] text-slate-300 font-medium">Service Online</span>
+            <div class="p-4 border-t border-slate-50">
+                <div class="bg-slate-50/80 rounded-lg p-3 border border-slate-100">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#3ecf8e]"></span>
+                        <span class="text-[11px] text-slate-600 font-bold uppercase tracking-tight">Active Engine</span>
                     </div>
+                    <p class="text-[10px] text-slate-400 font-medium">FastAPI + SQLite v3.45</p>
                 </div>
             </div>
         </aside>
 
         <!-- Main Workspace -->
-        <main class="flex-1 flex flex-col overflow-hidden bg-white">
-            <!-- Breadcrumb Area -->
-            <div id="breadcrumbArea" class="h-12 bg-white border-b border-slate-100 flex items-center px-8 gap-4 shrink-0 shadow-sm z-0">
-                <div class="flex items-center gap-2 text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    <span class="text-xs">/</span>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Action Bar -->
+            <div id="breadcrumbArea" class="h-12 bg-white border-b border-slate-50 flex items-center px-8 justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 text-slate-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </div>
+                    <span id="breadcrumb" class="flex items-center gap-2 text-xs font-medium text-slate-400">/ explorer</span>
                 </div>
-                <span id="breadcrumb" class="flex items-center gap-2 text-xs font-medium"></span>
+                <div id="viewActions" class="flex items-center gap-2 hidden">
+                    <button onclick="refreshTableData()" class="p-1.5 hover:bg-slate-50 rounded-md text-slate-400 hover:text-slate-600 transition-all border border-transparent hover:border-slate-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+                    </button>
+                    <div class="h-4 w-px bg-slate-100 mx-1"></div>
+                    <button onclick="showApiView()" class="px-3 py-1 bg-[#3ecf8e] hover:bg-[#34b27b] text-white text-[11px] font-bold rounded shadow-sm flex items-center gap-1.5 transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        API DOCS
+                    </button>
+                </div>
             </div>
 
-            <!-- Views -->
-            <div class="flex-1 overflow-y-auto p-10 custom-scrollbar bg-[#f8f9fa]">
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar">
                 
-                <!-- Welcome -->
-                <div id="view-welcome" class="space-y-10 max-w-6xl mx-auto">
-                    <div class="flex flex-col gap-2">
-                        <h1 class="text-3xl font-bold text-slate-900">Welcome to SimpleLiteDB</h1>
-                        <p class="text-slate-500">Manage your SQLite databases with ease and a clean interface.</p>
+                <!-- Welcome View -->
+                <div id="view-welcome" class="p-12 max-w-5xl mx-auto animate-in fade-in duration-500">
+                    <div class="mb-12">
+                        <span class="text-[#3ecf8e] font-bold text-[11px] uppercase tracking-[0.2em] mb-2 block">Quick Start</span>
+                        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mb-4">Master Your SQLite Data.</h1>
+                        <p class="text-slate-500 text-lg leading-relaxed max-w-2xl">A high-performance management interface for SimpleLiteDB. Create databases, design tables, and integrate with your apps in minutes.</p>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm hover:border-[#3ecf8e]/50 transition-colors">
-                            <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-[#3ecf8e] mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group bg-white border border-slate-100 p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-[#3ecf8e]/30 transition-all cursor-pointer" onclick="showCreateDb()">
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-[#3ecf8e] mb-6 group-hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             </div>
-                            <h3 class="font-bold text-slate-900 mb-2">Service Status</h3>
-                            <p class="text-sm text-slate-500 leading-relaxed">FastAPI service is operational. Your data is being served over HTTP with AES-like token security.</p>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">Create New DB</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed">Initialize a new isolated SQLite instance with automatic API key generation.</p>
                         </div>
-                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm hover:border-[#3ecf8e]/50 transition-colors">
-                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-500 mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                        <div class="group bg-white border border-slate-100 p-8 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all cursor-pointer" onclick="showSqlTab()">
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 mb-6 group-hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
                             </div>
-                            <h3 class="font-bold text-slate-900 mb-2">DB Engine</h3>
-                            <p class="text-sm text-slate-500 leading-relaxed">SQLite 3 backend. Concurrent access handled via row-level locking or file-based isolation.</p>
-                        </div>
-                        <div class="bg-white border border-slate-200 p-6 rounded-xl shadow-sm hover:border-[#3ecf8e]/50 transition-colors">
-                            <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-500 mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            </div>
-                            <h3 class="font-bold text-slate-900 mb-2">System Info</h3>
-                            <p class="text-sm text-slate-500 leading-relaxed">SimpleLiteDB Explorer v3.0. Supabase Inspired. High performance grid rendering.</p>
+                            <h3 class="text-xl font-bold text-slate-900 mb-2">SQL Console</h3>
+                            <p class="text-sm text-slate-500 leading-relaxed">Run complex queries across your databases using standard SQLite syntax.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Table Content -->
-                <div id="view-table" class="hidden space-y-6 max-w-7xl mx-auto">
-                    <div class="flex items-center justify-between bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3zM3 9h18M9 3v18"/></svg>
-                            </div>
-                            <div>
-                                <h2 id="tableTitle" class="text-2xl font-bold text-slate-900 tracking-tight"></h2>
-                                <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Data Explorer</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <button onclick="refreshTableData()" class="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg font-bold text-xs transition-all flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-                                REFRESH
-                            </button>
-                            <button onclick="showApiInfo()" class="px-4 py-2 btn-primary rounded-lg font-bold text-xs transition-all shadow-sm flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                                API INTEGRATION
-                            </button>
+                <!-- Table View -->
+                <div id="view-table" class="hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    <div class="p-8 border-b border-slate-50 bg-white/50 backdrop-blur-sm sticky top-0 z-10">
+                        <div class="flex items-center gap-3">
+                            <h2 id="tableTitle" class="text-2xl font-extrabold text-slate-900 tracking-tight"></h2>
+                            <span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[10px] font-bold uppercase rounded">Table</span>
                         </div>
                     </div>
-                    
-                    <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-                        <div class="overflow-x-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse">
-                                <thead id="thead"></thead>
-                                <tbody id="tbody" class="text-slate-600 divide-y divide-slate-50"></tbody>
-                            </table>
-                        </div>
+                    <div class="p-0 overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead id="thead"></thead>
+                            <tbody id="tbody" class="divide-y divide-slate-50"></tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- SQL Console -->
-                <div id="view-sql" class="hidden space-y-6 max-w-7xl mx-auto">
-                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-                        <div>
-                            <h2 class="font-bold text-slate-900 text-2xl tracking-tight flex items-center gap-3">
-                                SQL Editor
-                                <span id="sqlTargetDb" class="text-[#3ecf8e] text-xs font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100"></span>
+                <!-- SQL Console View -->
+                <div id="view-sql" class="hidden p-8 animate-in fade-in duration-300">
+                    <div class="bg-white border border-slate-100 rounded-xl shadow-sm overflow-hidden mb-6">
+                        <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+                            <h2 class="font-bold text-slate-900 flex items-center gap-2">
+                                Query Editor
+                                <span id="sqlTargetDb" class="text-[#3ecf8e] text-[10px] bg-white px-2 py-0.5 border border-[#3ecf8e]/20 rounded-full"></span>
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-widest">Execute raw SQL queries</p>
+                            <button onclick="runSql()" class="px-4 py-1.5 btn-primary rounded-md text-[11px] uppercase tracking-widest shadow-sm">Execute</button>
                         </div>
-                        <button onclick="runSql()" class="px-6 py-2.5 btn-primary font-bold rounded-lg text-xs uppercase tracking-widest transition-all shadow-sm flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Run Query
-                        </button>
+                        <textarea id="sqlInput" class="w-full h-48 p-6 font-mono text-[14px] outline-none border-none bg-transparent resize-none text-slate-700" placeholder="SELECT * FROM users;"></textarea>
                     </div>
-                    
-                    <div class="border border-slate-200 rounded-xl bg-[#1c1c1c] p-1 shadow-lg overflow-hidden">
-                        <div class="flex items-center gap-2 px-4 py-2 border-b border-white/5 bg-white/5">
-                            <span class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></span>
-                            <span class="w-3 h-3 rounded-full bg-amber-500/20 border border-amber-500/50"></span>
-                            <span class="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></span>
-                            <span class="ml-2 text-[10px] text-slate-500 font-mono">query.sql</span>
-                        </div>
-                        <textarea id="sqlInput" class="w-full h-64 p-6 font-mono text-[14px] leading-relaxed outline-none border-none bg-transparent resize-none text-slate-300" placeholder="SELECT * FROM users WHERE active = 1;"></textarea>
-                    </div>
+                    <div id="sqlResult" class="bg-white border border-slate-100 rounded-xl overflow-hidden hidden shadow-sm"></div>
+                </div>
 
-                    <div id="sqlResult" class="mt-6 border border-slate-200 rounded-xl hidden overflow-hidden bg-white shadow-sm">
-                        <!-- SQL Results -->
+                <!-- API Docs View (The "New Page") -->
+                <div id="view-api" class="hidden p-12 max-w-6xl mx-auto animate-in fade-in duration-300">
+                    <div class="flex items-center gap-4 mb-12">
+                        <button onclick="switchBackFromApi()" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        </button>
+                        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">API Reference</h1>
+                    </div>
+                    <div id="apiContent" class="space-y-12">
+                        <!-- Dynamic API Content -->
                     </div>
                 </div>
+
             </div>
         </main>
     </div>
 
-    <!-- API Info Modal (Fullscreen) -->
-    <div id="apiModal" class="hidden fixed inset-0 z-[60] bg-white flex flex-col">
-        <div class="h-16 border-b border-slate-100 flex items-center justify-between px-8 shrink-0 bg-slate-50/50">
-            <h3 class="text-xl font-bold text-slate-900">API Integration Guide</h3>
-            <button onclick="document.getElementById('apiModal').classList.add('hidden')" class="p-2 hover:bg-slate-200 rounded-full transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div class="flex-1 overflow-y-auto p-8 md:p-12">
-            <div class="max-w-7xl mx-auto">
-                <div id="apiContent" class="font-inter"></div>
-                <div class="mt-12 pt-8 border-t border-slate-100 flex justify-center">
-                    <button onclick="document.getElementById('apiModal').classList.add('hidden')" class="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-md font-bold text-sm transition-all shadow-lg">Back to Explorer</button>
-                </div>
+    <!-- Professional Modals (Keep them simple & sharp) -->
+    <div id="createDbModal" class="hidden fixed inset-0 z-[100] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 p-8">
+            <h3 class="text-lg font-bold text-slate-900 mb-1">New Database</h3>
+            <p class="text-xs text-slate-400 mb-6 font-medium">Create a new isolated SQLite instance.</p>
+            <input id="newDbName" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] transition-all text-sm mb-6" placeholder="Project name...">
+            <div class="flex gap-2">
+                <button onclick="el('createDbModal').classList.add('hidden')" class="flex-1 py-2 text-slate-500 font-bold text-xs hover:bg-slate-50 rounded-lg transition-all">Cancel</button>
+                <button onclick="submitCreateDb()" class="flex-1 py-2 btn-primary rounded-lg font-bold text-xs shadow-sm">Create</button>
             </div>
         </div>
     </div>
 
-    <!-- Create DB Modal -->
-    <div id="createDbModal" class="hidden fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
-        <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-100">
-            <div class="p-8">
-                <h3 class="text-xl font-bold text-slate-900 mb-2">Create New Database</h3>
-                <p class="text-xs text-slate-500 mb-6">Enter a unique name for your new SQLite database file.</p>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Database Name</label>
-                        <input id="newDbName" type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#3ecf8e] focus:ring-1 focus:ring-[#3ecf8e] transition-all font-medium text-slate-700" placeholder="e.g. ecommerce_db">
-                    </div>
-                </div>
-                <div class="mt-8 flex gap-3">
-                    <button onclick="el('createDbModal').classList.add('hidden')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold text-xs transition-colors">Cancel</button>
-                    <button onclick="submitCreateDb()" class="flex-1 py-3 btn-primary rounded-lg font-bold text-xs transition-all shadow-md">Create Database</button>
-                </div>
+    <div id="createTableModal" class="hidden fixed inset-0 z-[100] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center p-6">
+        <div class="w-full max-w-lg bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 p-8">
+            <h3 class="text-lg font-bold text-slate-900 mb-1">New Table</h3>
+            <p class="text-xs text-slate-400 mb-6 font-medium italic">Database: <span id="currentDbName" class="text-[#3ecf8e]"></span></p>
+            <div class="space-y-4">
+                <input id="newTableName" type="text" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] transition-all text-sm" placeholder="Table name...">
+                <textarea id="newTableSql" class="w-full h-32 px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] transition-all font-mono text-xs resize-none" placeholder="id INTEGER PRIMARY KEY..."></textarea>
             </div>
-        </div>
-    </div>
-
-    <!-- Create Table Modal -->
-    <div id="createTableModal" class="hidden fixed inset-0 z-[70] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
-        <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-100">
-            <div class="p-8">
-                <h3 class="text-xl font-bold text-slate-900 mb-2">Create New Table</h3>
-                <p class="text-xs text-slate-500 mb-6">Define your table structure in <span id="currentDbName" class="font-bold text-[#3ecf8e]"></span></p>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">Table Name</label>
-                        <input id="newTableName" type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#3ecf8e] focus:ring-1 focus:ring-[#3ecf8e] transition-all font-medium text-slate-700" placeholder="e.g. users">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">SQL Structure (Columns)</label>
-                        <textarea id="newTableSql" class="w-full h-32 px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#3ecf8e] focus:ring-1 focus:ring-[#3ecf8e] transition-all font-mono text-[13px] text-slate-700 resize-none" placeholder="id INTEGER PRIMARY KEY AUTOINCREMENT,&#10;name TEXT,&#10;email TEXT UNIQUE"></textarea>
-                    </div>
-                </div>
-                <div class="mt-8 flex gap-3">
-                    <button onclick="el('createTableModal').classList.add('hidden')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold text-xs transition-colors">Cancel</button>
-                    <button onclick="submitCreateTable()" class="flex-1 py-3 btn-primary rounded-lg font-bold text-xs transition-all shadow-md">Create Table</button>
-                </div>
+            <div class="flex gap-2 mt-8">
+                <button onclick="el('createTableModal').classList.add('hidden')" class="flex-1 py-2 text-slate-500 font-bold text-xs hover:bg-slate-50 rounded-lg transition-all">Cancel</button>
+                <button onclick="submitCreateTable()" class="flex-1 py-2 btn-primary rounded-lg font-bold text-xs shadow-sm">Create Table</button>
             </div>
         </div>
     </div>

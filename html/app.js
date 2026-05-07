@@ -1,7 +1,8 @@
-// SimpleLiteDB Explorer v3.0 - Core Logic
+// SimpleLiteDB Explorer v4.0 - Core Logic
 let dashToken = localStorage.getItem('slite_token');
 let allDatabases = [];
 let currentActive = { db: '', table: '', apiKey: '' };
+let lastView = 'view-welcome';
 
 const el = (id) => document.getElementById(id);
 
@@ -54,19 +55,19 @@ async function renderSidebar() {
         dbDiv.innerHTML = `
             <div class="db-node ${isActiveDb ? 'active' : ''} group" onclick="showSqlTab('${db.name}', '${db.api_key}')">
                 <div class="flex items-center gap-2 flex-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-500'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-400 group-hover:text-slate-600'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
                     <span class="truncate">${db.name}</span>
                 </div>
-                <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="opacity-0 group-hover:opacity-100 p-1 hover:bg-slate-700 rounded transition-all" title="New Table">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-slate-100 border border-slate-200 rounded transition-all" title="New Table">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
             </div>
-            <div class="mt-1">
+            <div class="mt-0.5">
                 ${tables.map(t => {
                     const isActiveTable = currentActive.db === db.name && currentActive.table === t.name;
                     return `
                     <div class="table-node ${isActiveTable ? 'active' : ''}" onclick="showTable('${db.name}', '${t.name}', '${db.api_key}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                         <span class="truncate">${t.name}</span>
                     </div>
                     `;
@@ -79,18 +80,25 @@ async function renderSidebar() {
 
 // --- 4. Views & Actions ---
 function switchView(viewId) {
-    ['view-welcome', 'view-table', 'view-sql'].forEach(id => el(id).classList.add('hidden'));
+    if (viewId !== 'view-api') lastView = viewId;
+    ['view-welcome', 'view-table', 'view-sql', 'view-api'].forEach(id => el(id).classList.add('hidden'));
     el(viewId).classList.remove('hidden');
+    
+    // Toggle Top Action Bar
+    if (viewId === 'view-table' || viewId === 'view-sql') {
+        el('viewActions').classList.remove('hidden');
+    } else {
+        el('viewActions').classList.add('hidden');
+    }
+
     document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+    if (viewId === 'view-welcome') document.querySelectorAll('.nav-link')[0].classList.add('active');
+    if (viewId === 'view-sql') document.querySelectorAll('.nav-link')[1].classList.add('active');
 }
 
 async function showTable(db, table, apiKey) {
     currentActive = { db, table, apiKey };
-    el('breadcrumb').innerHTML = `
-        <span class="text-slate-400 font-medium">${db}</span> 
-        <span class="text-slate-300">/</span> 
-        <span class="text-slate-900 font-bold">${table}</span>
-    `;
+    el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> ${db} <span class="text-slate-300 font-normal">/</span> <span class="text-slate-900">${table}</span>`;
     el('tableTitle').innerText = table;
     switchView('view-table');
     refreshTableData();
@@ -101,8 +109,8 @@ function showSqlTab(dbName = '', apiKey = '') {
     if (dbName) currentActive = { db: dbName, table: '', apiKey };
     el('sqlTargetDb').innerText = `${currentActive.db || 'Select Database'}`;
     el('sqlResult').innerHTML = '';
+    el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> sql console`;
     switchView('view-sql');
-    document.querySelectorAll('.nav-link')[1].classList.add('active');
     renderSidebar();
 }
 
@@ -127,10 +135,10 @@ function renderGrid(rows, thead, tbody) {
         return;
     }
     const cols = Object.keys(rows[0]);
-    thead.innerHTML = `<tr>${cols.map(c => `<th class="border-r border-slate-100 last:border-0">${c}</th>`).join('')}</tr>`;
+    thead.innerHTML = `<tr>${cols.map(c => `<th class="border-r border-slate-50 last:border-0">${c}</th>`).join('')}</tr>`;
     tbody.innerHTML = rows.map((r, idx) => `
-        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-indigo-50/50 transition-colors">
-            ${cols.map(c => `<td class="border-r border-slate-100 last:border-0 truncate max-w-[250px] font-mono">${r[c]}</td>`).join('')}
+        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/20'} hover:bg-slate-50 transition-colors">
+            ${cols.map(c => `<td class="border-r border-slate-50 last:border-0 truncate max-w-[300px] font-mono text-[12px]">${r[c]}</td>`).join('')}
         </tr>
     `).join('');
 }
@@ -148,80 +156,117 @@ async function runSql() {
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
         el('sqlResult').classList.remove('hidden');
-        el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead"></thead><tbody id="stbody" class="divide-y divide-slate-50 text-[13px] text-slate-600 font-inter"></tbody></table></div>';
+        el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead"></thead><tbody id="stbody" class="divide-y divide-slate-50"></tbody></table></div>';
         renderGrid(data.rows, el('sthead'), el('stbody'));
         if (sql.toUpperCase().match(/CREATE|DROP|ALTER/)) loadAllDatabases();
     } catch (err) { alert("SQL Error: " + err.message); }
 }
 
-// --- 5. API Reference Guide ---
-function showApiInfo() {
+// --- 5. API Documentation Page ---
+function showApiView() {
     const { db, table, apiKey } = currentActive;
-    if (!db) return alert("Please select a database/table first.");
+    if (!db) return alert("Please select a database first.");
     const baseUrl = window.location.origin;
-    el('apiModal').classList.remove('hidden');
     
+    switchView('view-api');
+    el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> api reference`;
+
     el('apiContent').innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-indigo-500 shadow-lg">
-                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">API Endpoint</span>
-                <div class="text-xs font-mono select-all text-indigo-300 break-all">${baseUrl}/query</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Endpoint URL</span>
+                <code class="text-indigo-600 font-mono text-xs break-all">${baseUrl}/query</code>
             </div>
-            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-emerald-500 shadow-lg">
-                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">Database Name</span>
-                <div class="text-xs font-mono text-emerald-400 select-all">${db}</div>
+            <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Target Database</span>
+                <code class="text-[#3ecf8e] font-mono text-xs">${db}</code>
             </div>
-            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-amber-500 shadow-lg">
-                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">Authorization Header</span>
-                <div class="text-xs font-mono text-amber-400 select-all break-all">Bearer ${apiKey}</div>
+            <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Authorization</span>
+                <code class="text-slate-900 font-mono text-xs break-all">Bearer ${apiKey}</code>
             </div>
         </div>
 
-        <div class="space-y-6 mt-12">
-            <h4 class="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 border-b border-slate-100 pb-3">Code Implementation Examples</h4>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">JavaScript (Fetch)</p>
-                    </div>
-                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-pink-400">fetch</span>(<span class="text-amber-300">'${baseUrl}/query'</span>, {
-  <span class="text-slate-400">method</span>: <span class="text-amber-300">'POST'</span>,
-  <span class="text-slate-400">headers</span>: {
-    <span class="text-amber-300">'Content-Type'</span>: <span class="text-amber-300">'application/json'</span>,
-    <span class="text-amber-300">'Authorization'</span>: <span class="text-amber-300">'Bearer ${apiKey}'</span>
+        <div class="space-y-12 pt-8 border-t border-slate-50">
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4">Vanilla JavaScript</h3>
+                <div class="code-block">
+                    <span class="code-badge">JS / FETCH</span>
+                    <pre class="text-slate-300 text-[13px] font-mono leading-relaxed"><span class="text-[#3ecf8e]">fetch</span>('${baseUrl}/query', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ${apiKey}'
   },
-  <span class="text-slate-400">body</span>: <span class="text-cyan-400">JSON</span>.<span class="text-pink-400">stringify</span>({
-    <span class="text-slate-400">database</span>: <span class="text-amber-300">'${db}'</span>,
-    <span class="text-slate-400">sql</span>: <span class="text-amber-300">'SELECT * FROM ${table || 'table_name'}'</span>
+  body: JSON.stringify({
+    database: '${db}',
+    sql: 'SELECT * FROM ${table || 'your_table'}'
   })
-}).<span class="text-pink-400">then</span>(res => res.<span class="text-pink-400">json</span>())
-  .<span class="text-pink-400">then</span>(<span class="text-cyan-400">console</span>.<span class="text-pink-400">log</span>);</pre>
+}).then(res => res.json()).then(console.log);</pre>
                 </div>
+            </div>
 
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-slate-900"></span>
-                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-tight">Next.js (Server Side)</p>
-                    </div>
-                    <pre class="p-4 bg-[#1E293B] rounded-lg text-[11px] leading-relaxed text-slate-300 overflow-x-auto border border-slate-800 shadow-inner font-mono"><span class="text-purple-400">const</span> res = <span class="text-purple-400">await</span> <span class="text-pink-400">fetch</span>(<span class="text-amber-300">'${baseUrl}/query'</span>, {
-  <span class="text-slate-400">method</span>: <span class="text-amber-300">'POST'</span>,
-  <span class="text-slate-400">headers</span>: {
-    <span class="text-amber-300">'Authorization'</span>: <span class="text-amber-300">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
-    <span class="text-amber-300">'Content-Type'</span>: <span class="text-amber-300">'application/json'</span>
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4">Next.js Implementation</h3>
+                <div class="code-block">
+                    <span class="code-badge">React / Server Side</span>
+                    <pre class="text-slate-300 text-[13px] font-mono leading-relaxed"><span class="text-purple-400">const</span> res = <span class="text-purple-400">await</span> <span class="text-[#3ecf8e]">fetch</span>('${baseUrl}/query', {
+  method: 'POST',
+  headers: {
+    'Authorization': \`Bearer $\{process.env.SLITE_API_KEY\}\`,
+    'Content-Type': 'application/json'
   },
-  <span class="text-slate-400">body</span>: <span class="text-cyan-400">JSON</span>.<span class="text-pink-400">stringify</span>({
-    <span class="text-slate-400">database</span>: <span class="text-amber-300">'${db}'</span>,
-    <span class="text-slate-400">sql</span>: <span class="text-amber-300">'SELECT * FROM ${table || 'table_name'}'</span>
+  body: JSON.stringify({
+    database: '${db}',
+    sql: 'SELECT * FROM ${table || 'your_table'}'
   }),
-  <span class="text-slate-400">cache</span>: <span class="text-amber-300">'no-store'</span>
+  cache: 'no-store'
 });
-<span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> res.<span class="text-pink-400">json</span>();</pre>
+<span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> res.json();</pre>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Python (Requests)</h3>
+                    <div class="code-block">
+                        <span class="code-badge">Python 3</span>
+                        <pre class="text-slate-300 text-[12px] font-mono leading-relaxed"><span class="text-purple-400">import</span> requests
+
+res = requests.post('${baseUrl}/query', 
+  headers={'Authorization': 'Bearer ${apiKey}'},
+  json={
+    'database': '${db}',
+    'sql': 'SELECT * FROM ${table || 'table'}'
+  }
+)
+<span class="text-[#3ecf8e]">print</span>(res.json())</pre>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">PHP</h3>
+                    <div class="code-block">
+                        <span class="code-badge">cURL</span>
+                        <pre class="text-slate-300 text-[12px] font-mono leading-relaxed"><span class="text-indigo-400">$ch</span> = curl_init('${baseUrl}/query');
+curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_POSTFIELDS, json_encode([
+  'database' => '${db}',
+  'sql' => 'SELECT * FROM ${table || 'table'}'
+]));
+curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_HTTPHEADER, [
+  'Authorization: Bearer ${apiKey}',
+  'Content-Type: application/json'
+]);
+curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#3ecf8e]">true</span>);
+<span class="text-indigo-400">$response</span> = curl_exec(<span class="text-indigo-400">$ch</span>);</pre>
+                    </div>
                 </div>
             </div>
         </div>
     `;
+}
+
+function switchBackFromApi() {
+    switchView(lastView);
 }
 
 // --- 6. Creation Modals ---

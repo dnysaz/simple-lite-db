@@ -1,65 +1,68 @@
-/* Supabase-inspired Design System */
+/* Supabase-inspired Design System - Light Theme Sidebar */
 :root {
     --sb-primary: #3ecf8e;
     --sb-primary-hover: #34b27b;
-    --sb-bg-main: #f8f9fa;
-    --sb-bg-sidebar: #1c1c1c;
-    --sb-border: #e5e7eb;
-    --sb-text-main: #111827;
-    --sb-text-muted: #6b7280;
-    --sb-sidebar-text: #9ca3af;
-    --sb-sidebar-hover: #2e2e2e;
+    --sb-bg-main: #fcfcfc;
+    --sb-bg-sidebar: #ffffff;
+    --sb-border: #eef0f2;
+    --sb-text-main: #171717;
+    --sb-text-muted: #666666;
+    --sb-sidebar-text: #4b5563;
+    --sb-sidebar-hover: #f9fafb;
 }
 
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--sb-bg-main);
     color: var(--sb-text-main);
+    letter-spacing: -0.01em;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: #e2e8f0;
     border-radius: 10px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
+    background: #cbd5e1;
 }
 
 /* Sidebar Styling */
 .sidebar {
     background-color: var(--sb-bg-sidebar);
-    color: white;
+    color: var(--sb-text-main);
+    border-right: 1px solid var(--sb-border);
 }
 
 .db-node {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 12px;
-    margin: 2px 8px;
+    padding: 7px 12px;
+    margin: 2px 10px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
     color: var(--sb-sidebar-text);
     border-radius: 6px;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
 }
 
 .db-node:hover {
     background: var(--sb-sidebar-hover);
-    color: white;
+    color: var(--sb-text-main);
 }
 
 .db-node.active {
-    background: var(--sb-sidebar-hover);
-    color: var(--sb-primary);
+    background: #f0fdf4;
+    color: #166534;
+    font-weight: 600;
 }
 
 .table-node {
@@ -67,21 +70,23 @@ body {
     align-items: center;
     gap: 10px;
     padding: 6px 12px;
-    margin: 1px 8px 1px 32px;
+    margin: 1px 10px 1px 34px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--sb-sidebar-text);
     border-radius: 6px;
-    transition: all 0.2s;
+    transition: all 0.15s ease;
 }
 
 .table-node:hover {
     background: var(--sb-sidebar-hover);
-    color: white;
+    color: var(--sb-text-main);
 }
 
 .table-node.active {
+    background: #f0fdf4;
     color: var(--sb-primary);
+    font-weight: 600;
 }
 
 /* Header & Nav */
@@ -89,47 +94,73 @@ body {
     font-size: 13px;
     font-weight: 500;
     color: var(--sb-text-muted);
-    padding: 8px 12px;
+    padding: 6px 12px;
     border-radius: 6px;
     transition: all 0.2s;
 }
 
 .nav-link:hover {
-    background: #f3f4f6;
     color: var(--sb-text-main);
 }
 
 .nav-link.active {
-    background: white;
+    background: #f9fafb;
     color: var(--sb-text-main);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     border: 1px solid var(--sb-border);
 }
 
 /* Table Design */
 table th {
-    background: #f9fafb;
+    background: #fbfbfb;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--sb-text-muted);
-    padding: 12px 16px !important;
+    color: #888888;
+    padding: 10px 16px !important;
     border-bottom: 1px solid var(--sb-border);
 }
 
 table td {
     padding: 12px 16px !important;
     font-size: 13px;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid #f7f7f7;
+    color: #333333;
 }
 
 .btn-primary {
     background-color: var(--sb-primary);
-    color: #052e16;
+    color: #ffffff;
+    font-weight: 600;
     transition: all 0.2s;
 }
 
 .btn-primary:hover {
     background-color: var(--sb-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* API Page Styling */
+.code-block {
+    background: #1c1c1c;
+    border-radius: 8px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.code-badge {
+    position: absolute;
+    top: 0;
+    right: 16px;
+    transform: translateY(-50%);
+    background: #333;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #aaa;
+    font-weight: bold;
+    border: 1px solid #444;
 }
