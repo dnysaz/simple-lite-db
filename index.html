@@ -3,144 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleLiteDB | phpMyAdmin Style</title>
+    <title>SimpleLiteDB | Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/html/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="h-screen flex flex-col bg-[#f0f0f0] text-gray-800 overflow-hidden">
+<body class="h-screen flex flex-col bg-[#F1F5F9] text-slate-700 overflow-hidden text-[12px] font-inter">
 
-    <!-- Login Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#f0f0f0]">
-        <div class="w-full max-w-sm bg-white shadow-xl border border-gray-300 p-8">
-            <div class="flex items-center gap-3 mb-6 border-b pb-4">
-                <img src="https://www.phpmyadmin.net/static/images/logo.png" class="h-8 grayscale opacity-50" alt="logo">
-                <h1 class="text-xl font-bold text-gray-600">Lite Admin</h1>
-            </div>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-bold text-gray-600 mb-1">Username (IP)</label>
-                    <input type="text" id="username" required class="w-full px-3 py-2 border border-gray-300 outline-none focus:border-blue-500 text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-600 mb-1">Password</label>
-                    <input type="password" id="password" required class="w-full px-3 py-2 border border-gray-300 outline-none focus:border-blue-500 text-sm">
-                </div>
-                <button type="submit" class="w-full py-2 bg-gradient-to-b from-gray-100 to-gray-200 border border-gray-400 hover:border-gray-500 font-bold text-gray-700 text-sm active:shadow-inner">Log in</button>
-            </form>
-            <p id="loginError" class="text-red-600 text-xs mt-4 hidden"></p>
-        </div>
-    </div>
+    <!-- Script to Check Auth immediately -->
+    <script>
+        if (!localStorage.getItem('slite_token')) {
+            window.location.href = '/dashboard/login';
+        }
+    </script>
 
     <!-- Main Header -->
-    <header class="h-12 bg-white border-b border-gray-300 flex items-center justify-between px-4 shrink-0 shadow-sm z-10">
-        <div class="flex items-center gap-6 h-full">
-            <div class="flex items-center gap-2 h-full border-r pr-4">
-                <span class="text-xl">🗄️</span>
-                <span class="font-bold text-gray-700 text-sm">SimpleLiteDB</span>
+    <header class="h-11 bg-white border-b border-slate-200 flex items-center justify-between px-4 shrink-0 z-10">
+        <div class="flex items-center gap-8 h-full">
+            <div class="flex items-center gap-2 h-full border-r border-slate-100 pr-6">
+                <div class="w-6 h-6 bg-slate-900 rounded-sm flex items-center justify-center text-white font-bold text-xs">L</div>
+                <span class="font-bold text-slate-900 tracking-tight">LiteDB Explorer</span>
             </div>
-            <nav class="flex h-full text-sm font-medium text-gray-600">
-                <button class="px-4 hover:bg-gray-100 flex items-center gap-2 border-b-2 border-transparent hover:border-blue-500">🏠 Home</button>
-                <button onclick="showSqlTab()" class="px-4 hover:bg-gray-100 flex items-center gap-2 border-b-2 border-transparent hover:border-blue-500">📄 SQL</button>
-                <button class="px-4 hover:bg-gray-100 flex items-center gap-2 border-b-2 border-transparent hover:border-blue-500">📦 Export</button>
+            <nav class="flex h-full gap-1">
+                <button onclick="switchView('view-welcome')" class="nav-link active">Dashboard</button>
+                <button onclick="showSqlTab()" class="nav-link">SQL Console</button>
+                <button class="nav-link">Settings</button>
             </nav>
         </div>
-        <div class="flex items-center gap-4 text-xs font-medium text-gray-500">
-            <span id="userDisplay"></span>
-            <button onclick="location.reload()" class="text-blue-600 hover:underline">Logout</button>
+        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-400">
+            <span id="userDisplay" class="bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold"></span>
+            <button onclick="logout()" class="text-indigo-600 hover:underline font-bold">Logout</button>
         </div>
     </header>
 
     <div class="flex-1 flex overflow-hidden">
         <!-- Sidebar Explorer -->
-        <aside class="w-64 bg-white border-r border-gray-300 flex flex-col shrink-0">
-            <div class="p-2 border-b bg-gray-50 flex items-center justify-between">
-                <span class="text-[11px] font-bold text-gray-500 uppercase tracking-tighter">Databases</span>
-                <button onclick="showCreateDb()" class="text-blue-600 text-lg font-bold hover:bg-blue-50 px-2 rounded">+</button>
+        <aside class="w-60 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="p-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Databases</span>
+                <button onclick="showCreateDb()" class="text-indigo-600 font-bold hover:bg-indigo-50 px-1.5 rounded transition-colors uppercase text-[10px]">New DB</button>
             </div>
-            <div id="sidebarContent" class="flex-1 overflow-y-auto custom-scrollbar p-1 space-y-1">
+            <div id="sidebarContent" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
                 <!-- DB Tree injected here -->
             </div>
         </aside>
 
         <!-- Main Workspace -->
         <main class="flex-1 flex flex-col overflow-hidden bg-white">
-            <!-- Tabs Menu (Context sensitive) -->
-            <div id="tabsMenu" class="h-9 bg-gray-100 border-b border-gray-300 flex px-2 gap-1 shrink-0">
-                <button onclick="switchView('view-welcome')" class="tab-btn active">Structure</button>
-                <button id="browseTabBtn" class="tab-btn hidden">Browse</button>
-                <button id="sqlTabBtn" class="tab-btn">SQL</button>
-                <button class="tab-btn">Search</button>
+            <!-- Breadcrumb Area -->
+            <div id="breadcrumbArea" class="h-10 bg-slate-50 border-b border-slate-200 flex items-center px-4 gap-2 shrink-0 text-[11px] font-medium">
+                <span class="text-slate-400 uppercase tracking-widest text-[9px] font-black">Location</span>
+                <span id="breadcrumb" class="flex items-center gap-2"></span>
             </div>
 
             <!-- Views -->
-            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
                 
                 <!-- Welcome -->
-                <div id="view-welcome" class="space-y-6 max-w-4xl mx-auto">
-                    <div class="bg-blue-50 border border-blue-200 p-4 rounded text-sm text-blue-800">
-                        Welcome to SimpleLiteDB LiteAdmin. Select a database or table from the left menu to start.
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="border border-gray-300 rounded overflow-hidden">
-                            <div class="bg-gray-100 px-3 py-2 font-bold text-sm border-b">General Settings</div>
-                            <div class="p-3 text-xs space-y-2">
-                                <p><strong>Server:</strong> localhost via TCP/IP</p>
-                                <p><strong>Server version:</strong> SQLite 3.x over FastAPI</p>
-                                <p><strong>Protocol version:</strong> HTTP/1.1</p>
-                            </div>
+                <div id="view-welcome" class="space-y-8 max-w-5xl">
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="bg-indigo-50/50 border border-indigo-100 p-5 rounded-md">
+                            <h3 class="font-bold text-indigo-900 mb-2">Service Status</h3>
+                            <p class="text-[11px] text-indigo-700 leading-relaxed">FastAPI service is operational. Your data is being served over HTTP with AES-like token security.</p>
                         </div>
-                        <div class="border border-gray-300 rounded overflow-hidden">
-                            <div class="bg-gray-100 px-3 py-2 font-bold text-sm border-b">Appearance Settings</div>
-                            <div class="p-3 text-xs space-y-2">
-                                <p><strong>Language:</strong> English</p>
-                                <p><strong>Theme:</strong> pmaLite 1.0</p>
-                            </div>
+                        <div class="bg-emerald-50/50 border border-emerald-100 p-5 rounded-md">
+                            <h3 class="font-bold text-emerald-900 mb-2">DB Engine</h3>
+                            <p class="text-[11px] text-emerald-700 leading-relaxed">SQLite 3 backend. Concurrent access handled via row-level locking or file-based isolation.</p>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-5 rounded-md">
+                            <h3 class="font-bold text-slate-900 mb-2">System Info</h3>
+                            <p class="text-[11px] text-slate-500 leading-relaxed">SimpleLiteDB Explorer v2.0. Flat Design. No legacy dependencies.</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Table Content -->
-                <div id="view-table" class="hidden">
-                    <div class="flex items-center gap-2 mb-4">
-                        <span class="text-blue-600">📂</span>
-                        <h2 id="breadcrumb" class="text-lg font-bold text-gray-700"></h2>
+                <div id="view-table" class="hidden space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 id="tableTitle" class="text-xl font-bold text-slate-900 tracking-tight"></h2>
+                        <div class="flex gap-2">
+                            <button onclick="refreshTableData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-md font-bold text-[11px] transition-colors">REFRESH</button>
+                            <button onclick="showApiInfo()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-bold text-[11px] transition-colors shadow-sm">API INTEGRATION</button>
+                        </div>
                     </div>
                     
-                    <div class="border border-gray-300 rounded overflow-hidden shadow-sm">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-xs">
-                                <thead id="thead" class="bg-gray-100 border-b border-gray-300 font-bold text-gray-600"></thead>
-                                <tbody id="tbody" class="divide-y divide-gray-200"></tbody>
+                    <div class="border border-slate-200 rounded-md overflow-hidden bg-white">
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <thead id="thead" class="bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100"></thead>
+                                <tbody id="tbody" class="text-[11px] text-slate-600 divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
                 <!-- SQL Console -->
-                <div id="view-sql" class="hidden">
-                    <h2 class="font-bold text-gray-700 mb-4">Run SQL query/queries on database <span id="sqlTargetDb" class="text-blue-600"></span></h2>
-                    <div class="border border-gray-400 rounded p-1 bg-white">
-                        <textarea id="sqlInput" class="w-full h-48 p-4 font-mono text-sm outline-none resize-none" placeholder="SELECT * FROM table_name;"></textarea>
+                <div id="view-sql" class="hidden space-y-4">
+                    <h2 class="font-bold text-slate-900 text-lg tracking-tight">SQL Console <span id="sqlTargetDb" class="text-indigo-600 ml-2 text-xs font-medium bg-indigo-50 px-2 py-0.5 rounded"></span></h2>
+                    <div class="border border-slate-200 rounded-md bg-slate-50 p-1">
+                        <textarea id="sqlInput" class="w-full h-40 p-4 font-mono text-[12px] outline-none border-none bg-transparent resize-none text-slate-700" placeholder="SELECT * FROM table_name;"></textarea>
                     </div>
-                    <div class="mt-4 flex justify-end">
-                        <button onclick="runSql()" class="px-6 py-2 bg-gray-200 border border-gray-400 hover:bg-gray-300 font-bold text-gray-700 text-xs shadow-sm">Go</button>
+                    <div class="flex justify-end">
+                        <button onclick="runSql()" class="px-6 py-2.5 bg-slate-900 hover:bg-black text-white font-bold rounded-md text-[10px] uppercase tracking-widest transition-all">Execute Query</button>
                     </div>
-                    <div id="sqlResult" class="mt-6 border border-gray-300 rounded hidden">
-                        <!-- SQL Results injected here -->
+                    <div id="sqlResult" class="mt-6 border border-slate-200 rounded-md hidden overflow-hidden bg-white">
+                        <!-- SQL Results -->
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="h-6 bg-gray-100 border-t border-gray-300 px-4 flex items-center justify-between shrink-0 text-[10px] text-gray-500 font-medium">
-        <div>SimpleLiteDB LiteAdmin | 2024 (Built with Tailwind CSS)</div>
-        <div id="serverTime"></div>
-    </footer>
+    <!-- API Info Modal -->
+    <div id="apiModal" class="hidden fixed inset-0 z-[60] bg-slate-900/20 backdrop-blur-sm flex items-center justify-center p-6">
+        <div class="w-full max-w-xl bg-white rounded-md p-8 border border-slate-200 shadow-2xl">
+            <h3 class="text-lg font-bold mb-4 text-slate-900">Integration Details</h3>
+            <div id="apiContent" class="space-y-4 font-mono text-[11px] bg-slate-50 p-6 rounded-md border border-slate-100 text-slate-700"></div>
+            <button onclick="document.getElementById('apiModal').classList.add('hidden')" class="mt-6 w-full py-3 bg-slate-100 hover:bg-slate-200 rounded-md font-bold text-slate-500 text-xs transition-colors">Close Guide</button>
+        </div>
+    </div>
 
     <script src="/html/app.js"></script>
 </body>

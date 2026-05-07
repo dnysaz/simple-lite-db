@@ -1,73 +1,92 @@
-/* phpMyAdmin Style Custom CSS */
+/* Flat Design Pro Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 10px;
+    background: #cbd5e1;
+    border-radius: 2px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background: #94a3b8;
 }
 
-.tab-btn {
-    padding: 0 12px;
+.nav-link {
+    padding: 0 16px;
     height: 100%;
     font-size: 11px;
-    font-weight: 600;
-    color: #555;
-    border: 1px solid transparent;
-    border-bottom: none;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
-    border-radius: 4px 4px 0 0;
-    transition: all 0.1s;
 }
 
-.tab-btn:hover {
-    background: #fff;
-    border-color: #ccc;
-}
-
-.tab-btn.active {
-    background: #fff;
-    border-color: #ccc;
-    color: #000;
-}
-
-.db-tree-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 4px;
-    cursor: pointer;
-    font-size: 11px;
-}
-
-.db-tree-item:hover {
-    background: #eef2ff;
+.nav-link:hover {
     color: #4f46e5;
+    background: #f8fafc;
+}
+
+.nav-link.active {
+    color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.db-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #334155;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.db-node:hover {
+    background: #f1f5f9;
 }
 
 .table-node {
-    margin-left: 18px;
-    padding: 1px 4px;
-    color: #666;
+    margin-left: 24px;
+    padding: 4px 8px;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
 }
 
 .table-node:hover {
-    background: #f3f4f6;
-    color: #2563eb;
-    text-decoration: underline;
+    background: #f8fafc;
+    color: #4f46e5;
+}
+
+.table-node::before {
+    content: "•";
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+th {
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 8px 12px;
+    white-space: nowrap;
 }
