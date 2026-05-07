@@ -170,32 +170,24 @@ function showApiInfo() {
     el('apiModal').classList.remove('hidden');
     
     el('apiContent').innerHTML = `
-        <!-- Credentials Card -->
-        <div class="grid grid-cols-1 gap-3">
-            <div class="p-6 bg-slate-900 rounded-lg text-white border-l-4 border-indigo-500 shadow-lg">
-                <div class="flex flex-col gap-3">
-                    <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">API Endpoint</span>
-                        <span class="text-xs font-mono select-all text-indigo-300">${baseUrl}/query</span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Database</span>
-                        <span class="text-xs font-mono text-emerald-400 select-all">${db}</span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-800 pb-2">
-                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">API Key (Raw)</span>
-                        <span class="text-xs font-mono text-amber-400 select-all">${apiKey}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Auth Header</span>
-                        <span class="text-xs font-mono text-indigo-300 select-all">Bearer ${apiKey}</span>
-                    </div>
-                </div>
+        <!-- Credentials Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-indigo-500 shadow-lg">
+                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">API Endpoint</span>
+                <div class="text-xs font-mono select-all text-indigo-300 break-all">${baseUrl}/query</div>
+            </div>
+            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-emerald-500 shadow-lg">
+                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">Database Name</span>
+                <div class="text-xs font-mono text-emerald-400 select-all">${db}</div>
+            </div>
+            <div class="p-6 bg-slate-900 rounded-lg text-white border-t-4 border-amber-500 shadow-lg">
+                <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest block mb-2">Authorization Header</span>
+                <div class="text-xs font-mono text-amber-400 select-all break-all">Bearer ${apiKey}</div>
             </div>
         </div>
 
-        <div class="space-y-6 mt-8">
-            <h4 class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 border-b border-slate-100 pb-2">Implementation Examples</h4>
+        <div class="space-y-6 mt-12">
+            <h4 class="text-[12px] font-black uppercase tracking-[0.4em] text-slate-400 border-b border-slate-100 pb-3">Code Implementation Examples</h4>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Vanilla JS -->
