@@ -154,6 +154,15 @@ async def get_dashboard():
     with open(file_path, "r") as f:
         return f.read()
 
+@app.get("/dashboard/login", response_class=HTMLResponse)
+async def get_login_page():
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_path, "login.html")
+    if not os.path.exists(file_path):
+        return HTMLResponse(content="<h1>login.html not found</h1>", status_code=404)
+    with open(file_path, "r") as f:
+        return f.read()
+
 # Mount folder assets
 app.mount("/html", StaticFiles(directory="html"), name="html")
 
