@@ -1,0 +1,23 @@
+# Environment variables
+.env
+.slite.pid
+
+# Logs
+*.log
+slite.log
+
+# Database files
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Backups/Downloads
+downloads/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS files
+.DS_Store

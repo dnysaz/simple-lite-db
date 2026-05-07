@@ -1,0 +1,234 @@
+#!/bin/bash
+
+# SimpleLiteDB CLI wrapper
+
+COMMAND=$1
+SUBCOMMAND=$2
+OPTION=$3
+
+PID_FILE=".slite.pid"
+LOG_FILE="slite.log"
+KEYS_FILE=".keys.json"
+
+# Pastikan folder data ada
+mkdir -p data
+
+# Konfigurasi Port (Default: 5117, bisa diubah di .env)
+PORT=$(grep "PORT=" .env | cut -d'=' -f2)
+PORT=${PORT:-5117}
+
+if [ "$COMMAND" == "start" ] && [ "$SUBCOMMAND" == "db" ]; then
+    if [ -f "$PID_FILE" ]; then
+        echo "⚠️  SimpleLiteDB is already running (PID: $(cat $PID_FILE))."
+        exit 1
+    fi
+    echo "🚀 Starting SimpleLiteDB Service on port $PORT..."
+    nohup uvicorn app:app --host 0.0.0.0 --port $PORT > $LOG_FILE 2>&1 &
+    echo $! > $PID_FILE
+    echo "✅ Started. Logs are in $LOG_FILE. PID: $(cat $PID_FILE)"
+
+elif [ "$COMMAND" == "stop" ] && [ "$SUBCOMMAND" == "db" ]; then
+    if [ ! -f "$PID_FILE" ]; then
+        echo "⚠️  SimpleLiteDB is not running."
+        exit 1
+    fi
+    PID=$(cat $PID_FILE)
+    echo "🛑 Stopping SimpleLiteDB (PID: $PID)..."
+    kill $PID
+    rm $PID_FILE
+    echo "✅ Stopped."
+
+elif [ "$COMMAND" == "create" ] && [ "$SUBCOMMAND" == "db" ]; then
+    echo -n "input db name : "
+    read DB_NAME
+
+    if [ -z "$DB_NAME" ]; then
+        echo "❌ DB name cannot be empty."
+        exit 1
+    fi
+
+    # Buat file database jika belum ada
+    if [ ! -f "data/$DB_NAME.db" ]; then
+        python3 -c "import sqlite3; conn = sqlite3.connect('data/$DB_NAME.db'); conn.execute('PRAGMA journal_mode=WAL;'); conn.close()"
+        echo "✅ Database '$DB_NAME' created."
+    else
+        echo "ℹ️  Database '$DB_NAME' already exists."
+    fi
+
+    # Generate API Key jika flag --api ada
+    if [ "$OPTION" == "--api" ]; then
+        NEW_KEY=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))")
+        
+        # Simpan key ke .env dengan format KEY_DBNAME
+        ENV_VAR="KEY_${DB_NAME^^}" # Uppercase DB name
+        
+        if [ -f ".env" ]; then
+            if grep -q "$ENV_VAR=" .env; then
+                if [[ "$OSTYPE" == "darwin"* ]]; then
+                    sed -i '' "s/$ENV_VAR=.*/$ENV_VAR=$NEW_KEY/" .env
+                else
+                    sed -i "s/$ENV_VAR=.*/$ENV_VAR=$NEW_KEY/" .env
+                fi
+            else
+                echo "$ENV_VAR=$NEW_KEY" >> .env
+            fi
+        else
+            echo "$ENV_VAR=$NEW_KEY" > .env
+        fi
+
+        # Deteksi IP Publik otomatis
+        PUBLIC_IP=$(curl -s https://ifconfig.me || echo "YOUR_VPS_IP")
+        
+        echo ""
+        echo "✨ Project Ready!"
+        echo "--------------------------"
+        echo "slite_url      : http://$PUBLIC_IP:$PORT"
+        echo "slite_db_name  : $DB_NAME"
+        echo "slite_api_key  : $NEW_KEY"
+        echo "--------------------------"
+        echo "Key saved to .env as $ENV_VAR"
+    fi
+
+elif [ "$COMMAND" == "refresh" ]; then
+    DB_NAME=$SUBCOMMAND
+    if [ -z "$DB_NAME" ]; then
+        echo "❌ Please provide database name: ./slite refresh [db_name]"
+        exit 1
+    fi
+    if [ -f "data/$DB_NAME.db" ]; then
+        echo "🔄 Refreshing database '$DB_NAME'..."
+        rm "data/$DB_NAME.db"
+        python3 -c "import sqlite3; conn = sqlite3.connect('data/$DB_NAME.db'); conn.execute('PRAGMA journal_mode=WAL;'); conn.close()"
+        echo "✅ Database '$DB_NAME' has been reset (empty)."
+    else
+        echo "❌ Database '$DB_NAME' does not exist."
+    fi
+
+elif [ "$COMMAND" == "delete" ]; then
+    DB_NAME=$SUBCOMMAND
+    if [ -z "$DB_NAME" ]; then
+        echo "❌ Please provide database name: ./slite delete [db_name]"
+        exit 1
+    fi
+    echo -n "⚠️  Are you sure you want to delete '$DB_NAME'? This will also remove the API Key. (y/n): "
+    read CONFIRM
+    if [ "$CONFIRM" == "y" ]; then
+        # Hapus file DB
+        [ -f "data/$DB_NAME.db" ] && rm "data/$DB_NAME.db"
+        [ -f "data/$DB_NAME.db-shm" ] && rm "data/$DB_NAME.db-shm"
+        [ -f "data/$DB_NAME.db-wal" ] && rm "data/$DB_NAME.db-wal"
+        
+        # Hapus API Key dari .env (Compatible with macOS and Linux)
+        ENV_VAR="KEY_${DB_NAME^^}"
+        if [ -f ".env" ]; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                sed -i '' "/$ENV_VAR=/d" .env
+            else
+                sed -i "/$ENV_VAR=/d" .env
+            fi
+        fi
+        
+        echo "✅ Database '$DB_NAME' and its API Key have been deleted."
+    else
+        echo "Operation cancelled."
+    fi
+
+elif [ "$COMMAND" == "download" ]; then
+    DB_NAME=$SUBCOMMAND
+    if [ -z "$DB_NAME" ]; then
+        echo "❌ Please provide database name: ./slite download [db_name]"
+        exit 1
+    fi
+    if [ -f "data/$DB_NAME.db" ]; then
+        mkdir -p downloads
+        cp "data/$DB_NAME.db" "downloads/${DB_NAME}_backup_$(date +%F_%H-%M).db"
+        echo "✅ Database copied to: downloads/${DB_NAME}_backup_$(date +%F_%H-%M).db"
+        echo "You can now download it via SCP or SFTP."
+    else
+        echo "❌ Database '$DB_NAME' does not exist."
+    fi
+
+elif [ "$COMMAND" == "init" ]; then
+    echo "📂 Initializing SimpleLiteDB..."
+    
+    # Otomatis install dependencies
+    echo "📦 Installing dependencies from requirements.txt..."
+    if command -v pip3 > /dev/null; then
+        pip3 install -r requirements.txt
+    elif command -v pip > /dev/null; then
+        pip install -r requirements.txt
+    else
+        echo "⚠️  pip not found. Please install dependencies manually."
+    fi
+
+    mkdir -p data
+    
+    # Otomatis buka port di Firewall (UFW)
+    echo "🛡️  Configuring Firewall (UFW) for port $PORT..."
+    if command -v ufw > /dev/null; then
+        sudo ufw allow $PORT/tcp
+        echo "✅ Port $PORT is now allowed."
+    else
+        echo "⚠️  UFW not found. Please ensure port $PORT is open manually."
+    fi
+
+    if [ ! -f "data/main.db" ]; then
+        python3 -c 'import sqlite3; conn = sqlite3.connect("data/main.db"); conn.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)"); conn.commit(); conn.close()'
+        echo "✅ Created data/main.db with sample table."
+    else
+        echo "ℹ️  data/main.db already exists."
+    fi
+
+elif [ "$COMMAND" == "list" ] && [ "$SUBCOMMAND" == "db" ]; then
+    echo "📂 List of Databases:"
+    echo "--------------------------"
+    printf "%-20s %-10s\n" "Database Name" "Size"
+    echo "--------------------------"
+    for f in data/*.db; do
+        [ -e "$f" ] || continue
+        name=$(basename "$f" .db)
+        size=$(du -sh "$f" | cut -f1)
+        printf "%-20s %-10s\n" "$name" "$size"
+    done
+    echo "--------------------------"
+
+elif [ "$COMMAND" == "log" ]; then
+    if [ ! -f "$LOG_FILE" ]; then
+        echo "⚠️  No log file found."
+        exit 1
+    fi
+    echo "📄 Showing logs (Ctrl+C to stop)..."
+    tail -f $LOG_FILE
+
+elif [ "$COMMAND" == "help" ] || [ -z "$COMMAND" ]; then
+    echo "   _____ _ _ _            _____  ____  "
+    echo "  / ____| (_) |          |  __ \|  _ \ "
+    echo " | (___ | |_| |_ ___     | |  | | |_) |"
+    echo "  \___ \| | | __/ _ \    | |  | |  _ < "
+    echo "  ____) | | | ||  __/    | |__| | |_) |"
+    echo " |_____/|_|_|\__\___|    |_____/|____/ "
+    echo "                                       "
+    echo "SimpleLiteDB CLI - SQLite over HTTP Service"
+    echo ""
+    echo "Usage: ./slite [command] [subcommand] [option]"
+    echo ""
+    echo "Database Management:"
+    echo "  init               Setup project, install deps & firewall"
+    echo "  create db --api    Create new database & API key"
+    echo "  list db            List all databases & sizes"
+    echo "  refresh [name]     Empty/reset a database"
+    echo "  delete [name]      Delete database & API key"
+    echo "  download [name]    Create backup in /downloads"
+    echo ""
+    echo "Service Control:"
+    echo "  start db           Start service in background (Port: $PORT)"
+    echo "  stop db            Stop background service"
+    echo "  log                View live service logs"
+    echo ""
+    echo "General:"
+    echo "  help               Show this help message"
+    echo ""
+
+else
+    ./slite help
+fi
