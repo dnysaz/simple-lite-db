@@ -59,7 +59,7 @@ You will be prompted to enter a database name. After creation, you'll receive:
 ```
 ✨ Project Ready!
 --------------------------
-slite_url      : http://145.79.12.100:5117
+slite_url      : http://YOUR_VPS_IP:5117
 slite_db_name  : myproject
 slite_api_key  : xxxxxxxxxxxxxxxxxxxxxxxxxxx
 --------------------------
