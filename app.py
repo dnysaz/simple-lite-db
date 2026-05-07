@@ -35,8 +35,9 @@ async def query(
     authorization: str = Header(None)
 ):
     # 1. Validasi Auth per Database
-    # Format key di .env: KEY_DBNAME (e.g. KEY_TESTDB)
-    env_key_name = f"KEY_{q.database.upper()}"
+    # Format key di .env: KEY_DBNAME (e.g. KEY_ONLINE_NOTE)
+    db_upper = q.database.upper().replace("-", "_")
+    env_key_name = f"KEY_{db_upper}"
     db_api_key = os.getenv(env_key_name)
 
     if not db_api_key:
