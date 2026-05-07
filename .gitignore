@@ -19,5 +19,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Documentation
+blueprint.md
+
 # OS files
 .DS_Store
