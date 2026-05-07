@@ -3,135 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimpleLiteDB Explorer</title>
+    <title>SimpleLiteDB Super Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .sidebar-item-active { background: rgba(79, 70, 229, 0.15); color: #818CF8; border-right: 3px solid #6366f1; }
     </style>
 </head>
-<body class="min-h-screen custom-scrollbar">
+<body class="min-h-screen custom-scrollbar overflow-hidden">
 
     <!-- Login Overlay -->
     <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A] p-4">
         <div class="w-full max-w-md glass rounded-[2.5rem] p-10 shadow-2xl">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-500/10 rounded-2xl mb-4 border border-indigo-500/20">
-                    <span class="text-3xl">🔒</span>
+                    <span class="text-3xl">🚀</span>
                 </div>
-                <h1 class="text-3xl font-extrabold tracking-tight">Lite Explorer</h1>
-                <p class="text-slate-400 mt-2">Login with your VPS credentials</p>
+                <h1 class="text-3xl font-extrabold tracking-tight">Super Admin</h1>
+                <p class="text-slate-400 mt-2 text-sm uppercase tracking-widest font-bold">SimpleLiteDB Explorer</p>
             </div>
             <form id="loginForm" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Username (IP Public)</label>
-                    <input type="text" id="username" required placeholder="e.g. 145.79.12.100" 
-                           class="w-full px-5 py-4 rounded-2xl bg-slate-800/50 border border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-600">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Username (IP)</label>
+                    <input type="text" id="username" required placeholder="145.79.12.100" class="w-full px-5 py-4 rounded-2xl bg-slate-800/50 border border-slate-700 outline-none focus:border-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2 ml-1">Dashboard Password</label>
-                    <input type="password" id="password" required placeholder="Enter password" 
-                           class="w-full px-5 py-4 rounded-2xl bg-slate-800/50 border border-slate-700 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all placeholder:text-slate-600">
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full px-5 py-4 rounded-2xl bg-slate-800/50 border border-slate-700 outline-none focus:border-indigo-500">
                 </div>
-                <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all mt-4">
-                    Access Dashboard
-                </button>
+                <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95">Enter Admin Panel</button>
             </form>
-            <p id="loginError" class="text-rose-500 text-sm text-center mt-6 hidden font-medium"></p>
+            <p id="loginError" class="text-rose-500 text-sm text-center mt-6 hidden"></p>
         </div>
     </div>
 
-    <!-- DB Selection Overlay (After Login) -->
-    <div id="dbOverlay" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-[#0F172A]/80 backdrop-blur-sm p-4">
-        <div class="w-full max-w-sm glass rounded-[2rem] p-8 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4 text-center">Open Database</h3>
-            <div class="space-y-4">
-                <input type="text" id="dbName" placeholder="Database Name" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-indigo-500">
-                <input type="password" id="apiKey" placeholder="Database API Key" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:border-indigo-500">
-                <button onclick="connectToDb()" class="w-full py-3 bg-indigo-600 rounded-xl font-bold hover:bg-indigo-700 transition-all">Connect</button>
-            </div>
-            <button onclick="location.reload()" class="w-full mt-4 text-slate-500 text-sm hover:text-white">Logout Dashboard</button>
-        </div>
-    </div>
-
-    <!-- Main Dashboard -->
+    <!-- Main Application -->
     <div id="dashboard" class="hidden h-screen flex flex-col">
-        <!-- Navbar -->
-        <nav class="glass border-b border-white/5 px-8 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-500/30">L</div>
-                <h2 id="currentDbTitle" class="text-lg font-bold tracking-tight"></h2>
+        <!-- Top Nav -->
+        <header class="h-16 glass border-b border-white/5 flex items-center justify-between px-8 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black">S</div>
+                <h1 class="font-bold tracking-tight text-lg">SimpleLiteDB <span class="text-indigo-400">Explorer</span></h1>
             </div>
-            <div class="flex items-center gap-4">
-                <span class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full text-xs font-bold border border-emerald-500/20 uppercase tracking-tighter">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> DB Active
-                </span>
-                <button onclick="logoutDb()" class="text-slate-400 hover:text-white text-sm font-bold transition-colors">Switch DB</button>
+            <div class="flex items-center gap-6">
+                <div class="text-right">
+                    <p id="userDisplay" class="text-xs font-bold text-slate-400"></p>
+                    <p class="text-[10px] text-emerald-500 font-black uppercase tracking-tighter animate-pulse">● System Online</p>
+                </div>
+                <button onclick="location.reload()" class="p-2 hover:bg-white/5 rounded-full transition-colors">🚪</button>
             </div>
-        </nav>
+        </header>
 
         <div class="flex-1 flex overflow-hidden">
             <!-- Sidebar -->
-            <aside class="w-72 glass border-r border-white/5 p-6 flex flex-col gap-8">
-                <div>
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">Tables</h3>
-                    <div id="tableList" class="space-y-1 custom-scrollbar overflow-y-auto max-h-[400px]"></div>
+            <aside class="w-72 glass border-r border-white/5 flex flex-col shrink-0 overflow-y-auto custom-scrollbar">
+                <div class="p-6">
+                    <button onclick="showCreateDb()" class="w-full py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-all mb-8">
+                        + New Database
+                    </button>
+                    
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 px-2">Databases</h3>
+                    <div id="dbList" class="space-y-4">
+                        <!-- Databases and tables injected here -->
+                        <div class="text-slate-600 text-xs px-2 italic">Scanning...</div>
+                    </div>
                 </div>
             </aside>
 
-            <!-- Content Area -->
-            <main class="flex-1 flex flex-col overflow-hidden p-8">
-                <div id="welcomeScreen" class="flex-1 flex flex-col items-center justify-center text-center opacity-50">
-                    <span class="text-6xl mb-4">📂</span>
-                    <h3 class="text-xl font-bold">Select a table to browse data</h3>
+            <!-- Main Content -->
+            <main id="mainContent" class="flex-1 flex flex-col p-8 overflow-y-auto custom-scrollbar relative">
+                
+                <!-- Welcome Screen -->
+                <div id="view-welcome" class="flex-1 flex flex-col items-center justify-center text-center opacity-40">
+                    <div class="text-6xl mb-6">⚡</div>
+                    <h2 class="text-3xl font-black mb-2">Welcome, Super Admin</h2>
+                    <p class="text-slate-400">Select a database or table from the sidebar to manage your data.</p>
                 </div>
 
-                <div id="dataTable" class="hidden flex-1 flex flex-col overflow-hidden bg-slate-900/50 rounded-3xl border border-white/5">
-                    <div class="p-6 border-b border-white/5 flex items-center justify-between">
-                        <h3 id="tableNameDisplay" class="text-xl font-bold text-white"></h3>
+                <!-- Table View -->
+                <div id="view-table" class="hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 id="activeTableName" class="text-3xl font-black tracking-tight"></h2>
+                            <p id="activeDbName" class="text-indigo-400 text-xs font-bold uppercase tracking-widest mt-1"></p>
+                        </div>
                         <div class="flex gap-2">
-                            <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-white transition-colors">🔄</button>
+                            <button onclick="refreshTableData()" class="p-3 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors">🔄</button>
+                            <button onclick="showApiInfo()" class="px-4 py-2 bg-indigo-500/10 text-indigo-400 text-xs font-bold rounded-xl border border-indigo-500/20">API Usage</button>
                         </div>
                     </div>
-                    <div class="flex-1 overflow-auto custom-scrollbar p-1">
-                        <table class="w-full text-left border-collapse">
-                            <thead id="tableHead" class="sticky top-0 bg-slate-900 z-10 text-xs font-bold text-slate-500 uppercase tracking-widest border-b border-white/10"></thead>
-                            <tbody id="tableBody" class="text-slate-300 text-sm"></tbody>
-                        </table>
+
+                    <!-- Grid -->
+                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left border-collapse">
+                                <thead id="thead" class="text-[10px] font-black uppercase tracking-widest text-slate-500 bg-black/20 border-b border-white/5"></thead>
+                                <tbody id="tbody" class="text-sm text-slate-300"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Console -->
-                <div class="mt-8 glass rounded-3xl p-6 shadow-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-indigo-400">SQL Console</h3>
-                        <button onclick="executeSQL()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-full transition-all active:scale-95">RUN QUERY</button>
+                <!-- SQL View -->
+                <div id="view-sql" class="hidden space-y-6">
+                    <h2 class="text-3xl font-black tracking-tight">SQL Console <span id="sqlDbName" class="text-indigo-500"></span></h2>
+                    <textarea id="sqlInput" class="w-full h-48 bg-black/40 rounded-3xl p-6 font-mono text-indigo-300 text-sm outline-none border border-white/10 focus:border-indigo-500/50 transition-all shadow-inner" placeholder="SELECT * FROM table_name;"></textarea>
+                    <button onclick="runSql()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl active:scale-95 transition-all">EXECUTE QUERY</button>
+                    
+                    <div id="sqlResult" class="bg-slate-900/80 rounded-3xl border border-white/10 overflow-hidden">
+                        <!-- Query results -->
                     </div>
-                    <textarea id="sqlConsole" placeholder="SELECT * FROM notes LIMIT 10;" 
-                              class="w-full h-24 bg-black/30 rounded-2xl p-4 font-mono text-sm text-indigo-300 outline-none border border-white/5 focus:border-indigo-500/30 transition-all resize-none"></textarea>
+                </div>
+
+                <!-- API Info Modal (Injected) -->
+                <div id="apiModal" class="hidden fixed inset-0 z-[60] bg-black/80 backdrop-blur flex items-center justify-center p-6">
+                    <div class="w-full max-w-2xl bg-[#1E293B] rounded-[2.5rem] p-10 border border-white/10">
+                        <h3 class="text-2xl font-black mb-6">API Integration Guide</h3>
+                        <div id="apiContent" class="space-y-4 font-mono text-sm"></div>
+                        <button onclick="document.getElementById('apiModal').classList.add('hidden')" class="mt-8 w-full py-4 bg-slate-800 rounded-2xl font-bold">Close</button>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
 
     <script>
-        let dbConfig = { db: '', key: '' };
-        let activeTable = '';
+        let dashToken = '';
+        let allDatabases = [];
+        let currentActive = { db: '', table: '', apiKey: '' };
 
-        // 1. Dashboard Login (Username & Password)
-        document.getElementById('loginForm').onsubmit = async (e) => {
+        const el = (id) => document.getElementById(id);
+
+        // 1. LOGIN
+        el('loginForm').onsubmit = async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorEl = document.getElementById('loginError');
-
-            errorEl.classList.add('hidden');
-
+            const username = el('username').value;
+            const password = el('password').value;
+            
             try {
                 const res = await fetch('/login', {
                     method: 'POST',
@@ -141,104 +154,174 @@
                 const data = await res.json();
                 if (!data.success) throw new Error(data.detail);
 
-                document.getElementById('loginOverlay').classList.add('hidden');
-                document.getElementById('dbOverlay').classList.remove('hidden');
+                dashToken = data.token;
+                el('loginOverlay').classList.add('hidden');
+                el('dashboard').classList.remove('hidden');
+                el('userDisplay').innerText = username;
+                loadAllDatabases();
             } catch (err) {
-                errorEl.innerText = "❌ Login Failed: " + err.message;
-                errorEl.classList.remove('hidden');
+                el('loginError').innerText = "❌ " + err.message;
+                el('loginError').classList.remove('hidden');
             }
         };
 
-        // 2. Connect to Database
-        async function connectToDb() {
-            const db = document.getElementById('dbName').value;
-            const key = document.getElementById('apiKey').value;
-
+        // 2. LOAD DATABASES
+        async function loadAllDatabases() {
             try {
-                const res = await fetch('/query', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-                    body: JSON.stringify({ database: db, sql: "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'" })
+                const res = await fetch('/admin/databases', {
+                    headers: { 'Authorization': `Bearer ${dashToken}` }
                 });
                 const data = await res.json();
-                if (!data.success) throw new Error(data.error);
+                if (!data.success) throw new Error();
 
-                dbConfig = { db, key };
-                document.getElementById('dbOverlay').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('currentDbTitle').innerText = db.toUpperCase();
-                renderTables(data.rows);
-            } catch (err) {
-                alert("❌ Database Error: " + err.message);
+                allDatabases = data.databases;
+                renderSidebar();
+            } catch (err) { alert("Failed to load databases"); }
+        }
+
+        async function renderSidebar() {
+            const list = el('dbList');
+            list.innerHTML = '';
+
+            for (const db of allDatabases) {
+                const dbDiv = document.createElement('div');
+                dbDiv.className = "space-y-1";
+                
+                // Get tables for this db
+                let tables = [];
+                try {
+                    const res = await fetch('/query', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${db.api_key}` },
+                        body: JSON.stringify({ database: db.name, sql: "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'" })
+                    });
+                    const d = await res.json();
+                    tables = d.rows || [];
+                } catch (e) {}
+
+                dbDiv.innerHTML = `
+                    <div class="flex items-center justify-between group">
+                        <button onclick="showSql('${db.name}', '${db.api_key}')" class="text-sm font-bold text-slate-300 hover:text-white px-2 py-1 flex items-center gap-2">
+                            <span>📦</span> ${db.name}
+                        </button>
+                        <span class="text-[9px] bg-slate-800 text-slate-500 px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">SQL</span>
+                    </div>
+                    <div class="ml-6 space-y-1 border-l border-slate-800 pl-3">
+                        ${tables.map(t => `
+                            <button onclick="showTable('${db.name}', '${t.name}', '${db.api_key}')" class="w-full text-left text-xs text-slate-500 hover:text-indigo-400 py-1 block truncate">
+                                ${t.name}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                list.appendChild(dbDiv);
             }
         }
 
-        function renderTables(rows) {
-            const list = document.getElementById('tableList');
-            list.innerHTML = rows.map(r => `
-                <button onclick="loadTable('${r.name}')" class="w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 transition-all flex items-center gap-3 text-slate-400 hover:text-white font-medium">
-                    <span class="text-slate-600">#</span> ${r.name}
-                </button>
-            `).join('');
+        // 3. NAVIGATION & VIEW
+        function switchView(viewId) {
+            ['view-welcome', 'view-table', 'view-sql'].forEach(id => el(id).classList.add('hidden'));
+            el(viewId).classList.remove('hidden');
         }
 
-        async function loadTable(name) {
-            activeTable = name;
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('dataTable').classList.remove('hidden');
-            document.getElementById('tableNameDisplay').innerText = name;
-            refreshData();
+        async function showTable(db, table, apiKey) {
+            currentActive = { db, table, apiKey };
+            el('activeTableName').innerText = table;
+            el('activeDbName').innerText = `Database: ${db}`;
+            switchView('view-table');
+            refreshTableData();
         }
 
-        async function refreshData() {
+        function showSql(db, apiKey) {
+            currentActive = { db, table: '', apiKey };
+            el('sqlDbName').innerText = `(${db})`;
+            el('sqlResult').innerHTML = '';
+            switchView('view-sql');
+        }
+
+        async function refreshTableData() {
+            const { db, table, apiKey } = currentActive;
             try {
                 const res = await fetch('/query', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${dbConfig.key}` },
-                    body: JSON.stringify({ database: dbConfig.db, sql: `SELECT * FROM ${activeTable} LIMIT 100` })
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({ database: db, sql: `SELECT * FROM ${table} LIMIT 100` })
                 });
                 const data = await res.json();
-                if (!data.success) throw new Error(data.error);
-                renderRows(data.rows);
+                renderGrid(data.rows, el('thead'), el('tbody'));
             } catch (err) { alert(err.message); }
         }
 
-        function renderRows(rows) {
-            const head = document.getElementById('tableHead');
-            const body = document.getElementById('tableBody');
-            if (rows.length === 0) { head.innerHTML = ""; body.innerHTML = "<tr><td class='p-12 text-center text-slate-500'>Empty</td></tr>"; return; }
+        function renderGrid(rows, thead, tbody) {
+            if (!rows || rows.length === 0) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '<tr><td class="p-10 text-center text-slate-600">No data found in this table.</td></tr>';
+                return;
+            }
             const cols = Object.keys(rows[0]);
-            head.innerHTML = `<tr>${cols.map(c => `<th class="p-4">${c}</th>`).join('')}</tr>`;
-            body.innerHTML = rows.map(r => `
+            thead.innerHTML = `<tr>${cols.map(c => `<th class="p-4 border-r border-white/5 last:border-0">${c}</th>`).join('')}</tr>`;
+            tbody.innerHTML = rows.map(r => `
                 <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
-                    ${cols.map(c => `<td class="p-4 text-slate-400 font-mono text-xs truncate max-w-[200px]">${r[c]}</td>`).join('')}
+                    ${cols.map(c => `<td class="p-4 border-r border-white/5 last:border-0 font-mono text-[11px] text-slate-400 truncate max-w-[200px]">${r[c]}</td>`).join('')}
                 </tr>
             `).join('');
         }
 
-        async function executeSQL() {
-            const sql = document.getElementById('sqlConsole').value;
-            if (!sql) return;
+        async function runSql() {
+            const sql = el('sqlInput').value;
+            const { db, apiKey } = currentActive;
             try {
                 const res = await fetch('/query', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${dbConfig.key}` },
-                    body: JSON.stringify({ database: dbConfig.db, sql })
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({ database: db, sql })
                 });
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error);
-                if (Array.isArray(data.rows)) {
-                    renderRows(data.rows);
-                    document.getElementById('welcomeScreen').classList.add('hidden');
-                    document.getElementById('dataTable').classList.remove('hidden');
-                    document.getElementById('tableNameDisplay').innerText = "Query Result";
-                } else { alert("✅ Success"); }
-            } catch (err) { alert("❌ SQL Error: " + err.message); }
+
+                const resultDiv = el('sqlResult');
+                resultDiv.innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead" class="bg-black/20 text-[10px] font-black uppercase tracking-widest text-slate-500"></thead><tbody id="stbody"></tbody></table></div>';
+                renderGrid(data.rows, el('sthead'), el('stbody'));
+                
+                // Refresh sidebar in case of CREATE/DROP
+                if (sql.toUpperCase().includes('TABLE')) loadAllDatabases();
+            } catch (err) { alert(err.message); }
         }
 
-        function logoutDb() {
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('dbOverlay').classList.remove('hidden');
+        async function showCreateDb() {
+            const name = prompt("Enter new database name:");
+            if (!name) return;
+            try {
+                const res = await fetch('/admin/create_db', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${dashToken}` },
+                    body: JSON.stringify({ name })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`✅ Database ${data.name} created!\nAPI KEY: ${data.api_key}`);
+                    loadAllDatabases();
+                } else {
+                    alert("❌ Error: " + data.error);
+                }
+            } catch (err) { alert(err.message); }
+        }
+
+        function showApiInfo() {
+            const { db, table, apiKey } = currentActive;
+            const baseUrl = window.location.origin;
+            el('apiModal').classList.remove('hidden');
+            el('apiContent').innerHTML = `
+                <div class="p-4 bg-black/40 rounded-xl space-y-2">
+                    <p class="text-indigo-400"># Method: POST</p>
+                    <p class="text-indigo-400"># URL: ${baseUrl}/query</p>
+                    <p class="text-slate-500"># Headers:</p>
+                    <p>Authorization: Bearer ${apiKey}</p>
+                    <p>Content-Type: application/json</p>
+                    <p class="text-slate-500 mt-4"># Body:</p>
+                    <p>{ "database": "${db}", "sql": "SELECT * FROM ${table}" }</p>
+                </div>
+            `;
         }
     </script>
 </body>
