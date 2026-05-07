@@ -24,16 +24,12 @@ async function loadAllDatabases() {
         const res = await fetch('/admin/databases', {
             headers: { 'Authorization': `Bearer ${dashToken}` }
         });
-        
         if (res.status === 401) return logout();
-        
         const data = await res.json();
         if (!data.success) throw new Error(data.detail);
         allDatabases = data.databases;
         renderSidebar();
-    } catch (err) { 
-        console.error("Load databases failed:", err);
-    }
+    } catch (err) { console.error("Load databases failed:", err); }
 }
 
 async function renderSidebar() {
@@ -141,9 +137,17 @@ async function runSql() {
     } catch (err) { alert("SQL Error: " + err.message); }
 }
 
-async function showCreateDb() {
-    const name = prompt("Database name:");
-    if (!name) return;
+// --- 4. Database Creation Modal ---
+function showCreateDb() {
+    el('newDbName').value = '';
+    el('createDbModal').classList.remove('hidden');
+    el('newDbName').focus();
+}
+
+async function submitCreateDb() {
+    const name = el('newDbName').value.trim();
+    if (!name) return alert("Database name is required.");
+    
     try {
         const res = await fetch('/admin/create_db', {
             method: 'POST',
@@ -151,30 +155,109 @@ async function showCreateDb() {
             body: JSON.stringify({ name })
         });
         const data = await res.json();
-        if (data.success) { alert(`Successfully created: ${data.name}`); loadAllDatabases(); }
-        else alert("Creation error: " + data.error);
+        if (data.success) {
+            el('createDbModal').classList.add('hidden');
+            alert(`✅ Database ${data.name} created!`);
+            loadAllDatabases();
+        } else alert("Creation error: " + data.error);
     } catch (err) { alert(err.message); }
 }
 
+// --- 5. API Reference Guide ---
 function showApiInfo() {
     const { db, table, apiKey } = currentActive;
+    const baseUrl = window.location.origin;
     el('apiModal').classList.remove('hidden');
+    
     el('apiContent').innerHTML = `
-        <div class="space-y-4">
-            <div>
-                <p class="text-indigo-600 font-bold mb-1">ENDPOINT</p>
-                <div class="p-3 bg-white border border-slate-200 rounded text-slate-700">POST ${window.location.origin}/query</div>
+        <!-- Credentials Card -->
+        <div class="grid grid-cols-1 gap-3">
+            <div class="p-4 bg-slate-900 rounded-md text-white border-l-4 border-indigo-500">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-400 text-[10px] uppercase font-bold">API Endpoint</span>
+                        <span class="text-xs font-mono select-all">${baseUrl}/query</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-400 text-[10px] uppercase font-bold">Database Name</span>
+                        <span class="text-xs font-mono text-indigo-300 select-all">${db}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400 text-[10px] uppercase font-bold">API Key</span>
+                        <span class="text-xs font-mono text-emerald-400 select-all">${apiKey}</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <p class="text-indigo-600 font-bold mb-1">AUTHORIZATION</p>
-                <div class="p-3 bg-white border border-slate-200 rounded text-slate-700">Bearer ${apiKey}</div>
-            </div>
-            <div>
-                <p class="text-indigo-600 font-bold mb-1">JSON BODY</p>
-                <pre class="p-3 bg-white border border-slate-200 rounded text-slate-700">{
-  "database": "${db}",
-  "sql": "SELECT * FROM ${table}"
-}</pre>
+        </div>
+
+        <div class="space-y-6 mt-6">
+            <h4 class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Implementation Examples</h4>
+            
+            <div class="space-y-4">
+                <!-- Vanilla JS -->
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-500">VANILLA JAVASCRIPT / BROWSER</p>
+                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">fetch('${baseUrl}/query', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ${apiKey}'
+  },
+  body: JSON.stringify({
+    database: '${db}',
+    sql: 'SELECT * FROM ${table}'
+  })
+}).then(res => res.json()).then(console.log);</pre>
+                </div>
+
+                <!-- Next.js -->
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-500">NEXT.JS (SERVER ACTION / API)</p>
+                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">const res = await fetch('${baseUrl}/query', {
+  method: 'POST',
+  headers: {
+    'Authorization': \`Bearer $\{process.env.SLITE_API_KEY\}\`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    database: '${db}',
+    sql: 'SELECT * FROM ${table}'
+  }),
+  cache: 'no-store'
+});
+const data = await res.json();</pre>
+                </div>
+
+                <!-- PHP -->
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-500">PHP (CURL)</p>
+                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">$ch = curl_init('${baseUrl}/query');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+    'database' => '${db}',
+    'sql' => 'SELECT * FROM ${table}'
+]));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer ${apiKey}',
+    'Content-Type: application/json'
+]);
+$response = curl_exec($ch);</pre>
+                </div>
+
+                <!-- Python -->
+                <div class="space-y-2">
+                    <p class="text-[10px] font-bold text-slate-500">PYTHON (REQUESTS)</p>
+                    <pre class="p-3 bg-slate-50 border border-slate-100 rounded text-[10px] text-slate-700 overflow-x-auto">import requests
+
+res = requests.post('${baseUrl}/query', 
+    headers={'Authorization': 'Bearer ${apiKey}'},
+    json={
+        'database': '${db}',
+        'sql': 'SELECT * FROM ${table}'
+    }
+)
+print(res.json())</pre>
+                </div>
             </div>
         </div>
     `;
