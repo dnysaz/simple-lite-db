@@ -164,9 +164,9 @@ elif [ "$COMMAND" == "init" ]; then
     # Otomatis install dependencies
     echo "📦 Installing dependencies from requirements.txt..."
     if command -v pip3 > /dev/null; then
-        pip3 install -r requirements.txt
+        pip3 install -r requirements.txt --break-system-packages
     elif command -v pip > /dev/null; then
-        pip install -r requirements.txt
+        pip install -r requirements.txt --break-system-packages
     else
         echo "⚠️  pip not found. Please install dependencies manually."
     fi
