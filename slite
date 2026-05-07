@@ -14,7 +14,7 @@ KEYS_FILE=".keys.json"
 mkdir -p data
 
 # Konfigurasi Port (Default: 5117, bisa diubah di .env)
-PORT=$(grep "PORT=" .env | cut -d'=' -f2)
+PORT=$(grep "PORT=" .env 2>/dev/null | cut -d'=' -f2)
 PORT=${PORT:-5117}
 
 if [ "$COMMAND" == "start" ] && [ "$SUBCOMMAND" == "db" ]; then
