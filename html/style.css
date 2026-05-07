@@ -143,24 +143,24 @@ table td {
 
 /* API Page Styling */
 .code-block {
-    background: #1c1c1c;
-    border-radius: 8px;
-    padding: 24px;
+    background: #f8fafc;
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    padding: 28px;
     position: relative;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .code-badge {
     position: absolute;
-    top: 0;
+    top: 12px;
     right: 16px;
-    transform: translateY(-50%);
-    background: #333;
+    background: #ffffff;
     padding: 2px 8px;
     border-radius: 4px;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
-    color: #aaa;
-    font-weight: bold;
-    border: 1px solid #444;
+    color: #94a3b8;
+    font-weight: 700;
+    border: 1px solid #e2e8f0;
+    letter-spacing: 0.05em;
 }

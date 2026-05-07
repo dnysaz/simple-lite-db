@@ -192,15 +192,15 @@ function showApiView() {
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Vanilla JavaScript</h3>
                 <div class="code-block">
                     <span class="code-badge">JS / FETCH</span>
-                    <pre class="text-slate-300 text-[13px] font-mono leading-relaxed"><span class="text-[#3ecf8e]">fetch</span>('${baseUrl}/query', {
-  method: 'POST',
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed"><span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
+  method: <span class="text-[#475569]">'POST'</span>,
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer ${apiKey}'
+    <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>,
+    <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>
   },
-  body: JSON.stringify({
-    database: '${db}',
-    sql: 'SELECT * FROM ${table || 'your_table'}'
+  body: <span class="text-[#0284c7]">JSON</span>.stringify({
+    database: <span class="text-[#475569]">'${db}'</span>,
+    sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
   })
 }).then(res => res.json()).then(console.log);</pre>
                 </div>
@@ -210,19 +210,19 @@ function showApiView() {
                 <h3 class="text-lg font-bold text-slate-900 mb-4">Next.js Implementation</h3>
                 <div class="code-block">
                     <span class="code-badge">React / Server Side</span>
-                    <pre class="text-slate-300 text-[13px] font-mono leading-relaxed"><span class="text-purple-400">const</span> res = <span class="text-purple-400">await</span> <span class="text-[#3ecf8e]">fetch</span>('${baseUrl}/query', {
-  method: 'POST',
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed"><span class="text-[#2563eb]">const</span> res = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
+  method: <span class="text-[#475569]">'POST'</span>,
   headers: {
-    'Authorization': \`Bearer $\{process.env.SLITE_API_KEY\}\`,
-    'Content-Type': 'application/json'
+    <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
+    <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>
   },
-  body: JSON.stringify({
-    database: '${db}',
-    sql: 'SELECT * FROM ${table || 'your_table'}'
+  body: <span class="text-[#0284c7]">JSON</span>.stringify({
+    database: <span class="text-[#475569]">'${db}'</span>,
+    sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
   }),
-  cache: 'no-store'
+  cache: <span class="text-[#475569]">'no-store'</span>
 });
-<span class="text-purple-400">const</span> data = <span class="text-purple-400">await</span> res.json();</pre>
+<span class="text-[#2563eb]">const</span> data = <span class="text-[#2563eb]">await</span> res.json();</pre>
                 </div>
             </div>
 
@@ -231,33 +231,33 @@ function showApiView() {
                     <h3 class="text-lg font-bold text-slate-900 mb-4">Python (Requests)</h3>
                     <div class="code-block">
                         <span class="code-badge">Python 3</span>
-                        <pre class="text-slate-300 text-[12px] font-mono leading-relaxed"><span class="text-purple-400">import</span> requests
+                        <pre class="text-[#334155] text-[12px] font-mono leading-relaxed"><span class="text-[#2563eb]">import</span> requests
 
 res = requests.post('${baseUrl}/query', 
-  headers={'Authorization': 'Bearer ${apiKey}'},
+  headers={<span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>},
   json={
-    'database': '${db}',
-    'sql': 'SELECT * FROM ${table || 'table'}'
+    <span class="text-[#0284c7]">'database'</span>: <span class="text-[#475569]">'${db}'</span>,
+    <span class="text-[#0284c7]">'sql'</span>: <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
   }
 )
-<span class="text-[#3ecf8e]">print</span>(res.json())</pre>
+<span class="text-[#0284c7]">print</span>(res.json())</pre>
                     </div>
                 </div>
                 <div>
                     <h3 class="text-lg font-bold text-slate-900 mb-4">PHP</h3>
                     <div class="code-block">
                         <span class="code-badge">cURL</span>
-                        <pre class="text-slate-300 text-[12px] font-mono leading-relaxed"><span class="text-indigo-400">$ch</span> = curl_init('${baseUrl}/query');
-curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_POSTFIELDS, json_encode([
-  'database' => '${db}',
-  'sql' => 'SELECT * FROM ${table || 'table'}'
+                        <pre class="text-[#334155] text-[12px] font-mono leading-relaxed"><span class="text-[#475569]">$ch</span> = curl_init('${baseUrl}/query');
+curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_POSTFIELDS, json_encode([
+  <span class="text-[#0284c7]">'database'</span> => <span class="text-[#475569]">'${db}'</span>,
+  <span class="text-[#0284c7]">'sql'</span> => <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
 ]));
-curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_HTTPHEADER, [
-  'Authorization: Bearer ${apiKey}',
-  'Content-Type: application/json'
+curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_HTTPHEADER, [
+  <span class="text-[#475569]">'Authorization: Bearer ${apiKey}'</span>,
+  <span class="text-[#475569]">'Content-Type: application/json'</span>
 ]);
-curl_setopt(<span class="text-indigo-400">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#3ecf8e]">true</span>);
-<span class="text-indigo-400">$response</span> = curl_exec(<span class="text-indigo-400">$ch</span>);</pre>
+curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#2563eb]">true</span>);
+<span class="text-[#475569]">$response</span> = curl_exec(<span class="text-[#475569]">$ch</span>);</pre>
                     </div>
                 </div>
             </div>
