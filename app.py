@@ -87,8 +87,8 @@ async def login(req: LoginRequest):
     dash_pass = os.getenv("DASHBOARD_PASS")
     
     if req.username == dash_user and req.password == dash_pass:
-        return {"success": true, "token": dash_pass} # Simple token for now
-    return {"success": false, "detail": "Invalid IP (Username) or Password"}
+        return {"success": True, "token": dash_pass} # Simple token for now
+    return {"success": False, "detail": "Invalid IP (Username) or Password"}
 
 @app.get("/dashboard", response_class=HTMLResponse)
 @app.get("/dashboard/", response_class=HTMLResponse)
