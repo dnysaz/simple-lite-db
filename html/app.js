@@ -182,9 +182,13 @@ function showApiInfo() {
                         <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Database</span>
                         <span class="text-xs font-mono text-emerald-400 select-all">${db}</span>
                     </div>
+                    <div class="flex justify-between border-b border-slate-800 pb-2">
+                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">API Key (Raw)</span>
+                        <span class="text-xs font-mono text-amber-400 select-all">${apiKey}</span>
+                    </div>
                     <div class="flex justify-between">
-                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Authorization</span>
-                        <span class="text-xs font-mono text-amber-400 select-all">Bearer ${apiKey}</span>
+                        <span class="text-slate-500 text-[10px] uppercase font-black tracking-widest">Auth Header</span>
+                        <span class="text-xs font-mono text-indigo-300 select-all">Bearer ${apiKey}</span>
                     </div>
                 </div>
             </div>
