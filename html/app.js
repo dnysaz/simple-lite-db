@@ -37,7 +37,7 @@ async function renderSidebar() {
     list.innerHTML = '';
     for (const db of allDatabases) {
         const dbDiv = document.createElement('div');
-        dbDiv.className = "mb-2";
+        dbDiv.className = "mb-1";
         
         let tables = [];
         try {
@@ -50,17 +50,22 @@ async function renderSidebar() {
             tables = d.rows || [];
         } catch (e) {}
 
+        const isActiveDb = currentActive.db === db.name;
         dbDiv.innerHTML = `
-            <div class="db-node" onclick="showSqlTab('${db.name}', '${db.api_key}')">
-                <span class="text-[9px] opacity-40 font-black">DB</span>
+            <div class="db-node ${isActiveDb ? 'active' : ''}" onclick="showSqlTab('${db.name}', '${db.api_key}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-500'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
                 <span class="truncate">${db.name}</span>
             </div>
-            <div class="space-y-[1px]">
-                ${tables.map(t => `
-                    <div class="table-node text-[11px]" onclick="showTable('${db.name}', '${t.name}', '${db.api_key}')">
+            <div class="mt-1">
+                ${tables.map(t => {
+                    const isActiveTable = currentActive.db === db.name && currentActive.table === t.name;
+                    return `
+                    <div class="table-node ${isActiveTable ? 'active' : ''}" onclick="showTable('${db.name}', '${t.name}', '${db.api_key}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-50"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
                         <span class="truncate">${t.name}</span>
                     </div>
-                `).join('')}
+                    `;
+                }).join('')}
             </div>
         `;
         list.appendChild(dbDiv);
@@ -76,10 +81,15 @@ function switchView(viewId) {
 
 async function showTable(db, table, apiKey) {
     currentActive = { db, table, apiKey };
-    el('breadcrumb').innerHTML = `<span class="bg-slate-100 text-[10px] px-1.5 py-0.5 rounded text-slate-500 font-bold uppercase">${db}</span> <span class="text-slate-200">/</span> <span class="text-slate-800 font-bold">${table}</span>`;
+    el('breadcrumb').innerHTML = `
+        <span class="text-slate-400 font-medium">${db}</span> 
+        <span class="text-slate-300">/</span> 
+        <span class="text-slate-900 font-bold">${table}</span>
+    `;
     el('tableTitle').innerText = table;
     switchView('view-table');
     refreshTableData();
+    renderSidebar(); // Update active state
 }
 
 function showSqlTab(dbName = '', apiKey = '') {
@@ -88,6 +98,7 @@ function showSqlTab(dbName = '', apiKey = '') {
     el('sqlResult').innerHTML = '';
     switchView('view-sql');
     document.querySelectorAll('.nav-link')[1].classList.add('active');
+    renderSidebar(); // Update active state
 }
 
 async function refreshTableData() {
@@ -131,7 +142,7 @@ async function runSql() {
         const data = await res.json();
         if (!data.success) throw new Error(data.error);
         el('sqlResult').classList.remove('hidden');
-        el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead" class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100"></thead><tbody id="stbody" class="divide-y divide-slate-50 text-[11px] text-slate-600 font-inter"></tbody></table></div>';
+        el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead"></thead><tbody id="stbody" class="divide-y divide-slate-50 text-[13px] text-slate-600 font-inter"></tbody></table></div>';
         renderGrid(data.rows, el('sthead'), el('stbody'));
         if (sql.toUpperCase().match(/CREATE|DROP|ALTER/)) loadAllDatabases();
     } catch (err) { alert("SQL Error: " + err.message); }
