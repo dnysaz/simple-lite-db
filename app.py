@@ -200,6 +200,7 @@ async def get_login_page():
 
 # Mount folder assets
 app.mount("/html", StaticFiles(directory="html"), name="html")
+app.mount("/docs", StaticFiles(directory="docs", html=True), name="docs")
 
 @app.get("/", response_class=HTMLResponse)
 async def get_root_dashboard():
