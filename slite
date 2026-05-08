@@ -219,6 +219,21 @@ elif [ "$COMMAND" == "log" ]; then
     echo "📄 Showing logs (Ctrl+C to stop)..."
     tail -f $LOG_FILE
 
+elif [ "$COMMAND" == "update" ]; then
+    echo "🔄 Updating SimpleLiteDB..."
+    
+    # Use existing CLI commands for stop/start
+    ./slite stop db
+    
+    echo "📥 Pulling latest changes..."
+    git pull origin main
+    
+    echo "📦 Updating dependencies..."
+    $PYTHON_BIN -m pip install -r requirements.txt
+    
+    ./slite start db
+    echo "✅ Update complete!"
+
 elif [ "$COMMAND" == "help" ] || [ -z "$COMMAND" ]; then
     echo "   _____ _ _ _            _____  ____  "
     echo "  / ____| (_) |          |  __ \|  _ \ "
@@ -242,6 +257,7 @@ elif [ "$COMMAND" == "help" ] || [ -z "$COMMAND" ]; then
     echo "Service Control:"
     echo "  start db           Start service in background (Port: $PORT)"
     echo "  stop db            Stop background service"
+    echo "  update             Stop, Pull Git, and Start service"
     echo "  log                View live service logs"
     echo ""
     echo "General:"
