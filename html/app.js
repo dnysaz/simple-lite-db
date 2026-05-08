@@ -333,19 +333,31 @@ async function submitRow() {
     const { db, table, apiKey } = currentActive;
     const inputs = Array.from(document.querySelectorAll('.row-input'));
     const data = {};
+    
+    // Only collect data from enabled inputs to avoid updating PKs
     inputs.forEach(input => {
-        const col = input.getAttribute('data-col');
-        data[col] = input.value;
+        if (!input.disabled) {
+            const col = input.getAttribute('data-col');
+            data[col] = input.value;
+        }
     });
 
     let sql = "";
     if (editingRowId) {
+        if (Object.keys(data).length === 0) return el('rowModal').classList.add('hidden');
         const sets = Object.keys(data).map(k => `"${k}" = ?`).join(', ');
         sql = `UPDATE "${table}" SET ${sets} WHERE rowid = ${editingRowId}`;
     } else {
-        const cols = Object.keys(data).map(k => `"${k}"`).join(', ');
-        const vals = Object.keys(data).map(() => '?').join(', ');
+        // Re-collect all for INSERT (including manually set PKs if any)
+        const insertData = {};
+        inputs.forEach(input => {
+            const col = input.getAttribute('data-col');
+            insertData[col] = input.value;
+        });
+        const cols = Object.keys(insertData).map(k => `"${k}"`).join(', ');
+        const vals = Object.keys(insertData).map(() => '?').join(', ');
         sql = `INSERT INTO "${table}" (${cols}) VALUES (${vals})`;
+        data.values = Object.values(insertData); // temporary for params
     }
 
     try {
@@ -355,7 +367,7 @@ async function submitRow() {
             body: JSON.stringify({ 
                 database: db, 
                 sql: sql, 
-                params: Object.values(data) 
+                params: editingRowId ? Object.values(data) : data.values 
             })
         });
         const d = await res.json();
