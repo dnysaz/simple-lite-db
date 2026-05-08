@@ -135,6 +135,9 @@ async def admin_create_db(req: CreateDbRequest, authorization: Optional[str] = H
     with open(".env", "a") as f:
         f.write(f"\n{env_key}={api_key}")
     
+    # Update current process environment
+    os.environ[env_key] = api_key
+    
     # Create empty db
     import sqlite3
     sqlite3.connect(db_path).close()
@@ -155,15 +158,18 @@ async def admin_delete_db(req: DeleteDbRequest, authorization: Optional[str] = H
     if os.path.exists(db_path):
         os.remove(db_path)
         
-        # Clean up .env (optional but recommended)
-        env_key = f"KEY_{db_name.upper().replace('-', '_')}="
+        # Clean up .env
+        env_key_prefix = f"KEY_{db_name.upper().replace('-', '_')}="
         if os.path.exists(".env"):
             with open(".env", "r") as f:
                 lines = f.readlines()
             with open(".env", "w") as f:
                 for line in lines:
-                    if not line.startswith(env_key):
+                    if not line.startswith(env_key_prefix):
                         f.write(line)
+        
+        # Clean up environment
+        os.environ.pop(env_key_prefix.replace("=", ""), None)
         
         return {"success": True}
     return {"success": False, "error": "Database not found"}

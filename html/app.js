@@ -1064,6 +1064,10 @@ async function createDatabaseTerminal(name, log) {
         const d = await res.json();
         if (d.success) {
             log(`Database '${d.name}' created successfully.`, 'success');
+            // Auto-switch to the new DB
+            currentActive = { db: d.name, table: '', apiKey: d.api_key };
+            renderSidebar();
+            log(`Active context: <span class="text-slate-900 font-bold">${d.name}</span>`, 'success');
             loadAllDatabases();
         } else log(d.error, 'error');
     } catch (e) { log(e.message, 'error'); }
