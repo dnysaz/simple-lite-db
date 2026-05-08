@@ -153,7 +153,6 @@ async function renderSidebar() {
         `;
     }
 }
-}
 
 // --- 4. Views & Actions ---
 function switchView(viewId) {
