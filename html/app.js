@@ -296,15 +296,25 @@ async function showRowModal(existingData = null) {
     const data = await res.json();
     const cols = data.rows || [];
 
-    el('rowFields').innerHTML = cols.map(c => `
+    el('rowFields').innerHTML = cols.map(c => {
+        const isPk = c.pk;
+        const isInserting = !existingData;
+        const isDisabled = (isPk && !isInserting) || (isPk && isInserting); // We disable PK on both for now to ensure system handles it
+        
+        return `
         <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${c.name} <span class="text-slate-300 font-normal">(${c.type})</span></label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                ${c.name} 
+                <span class="text-slate-300 font-normal">(${c.type})</span>
+                ${isPk ? '<span class="ml-2 text-[#3ecf8e] text-[9px] bg-emerald-50 px-1.5 py-0.5 rounded">AUTO-GENERATED</span>' : ''}
+            </label>
             <input type="text" data-col="${c.name}" class="row-input w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] text-sm" 
                 value="${existingData ? (existingData[c.name] ?? '') : ''}" 
-                ${c.pk && existingData ? 'disabled' : ''}
-                placeholder="${c.dflt_value || 'NULL'}">
+                ${isDisabled ? 'disabled' : ''}
+                placeholder="${isPk ? 'Will be assigned by system' : (c.dflt_value || 'NULL')}">
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     el('rowModal').classList.remove('hidden');
 }
@@ -348,16 +358,18 @@ async function submitRow() {
         const sets = Object.keys(data).map(k => `"${k}" = ?`).join(', ');
         sql = `UPDATE "${table}" SET ${sets} WHERE rowid = ${editingRowId}`;
     } else {
-        // Re-collect all for INSERT (including manually set PKs if any)
+        // For INSERT, we also skip disabled (PK) columns so SQLite handles AUTOINCREMENT
         const insertData = {};
         inputs.forEach(input => {
-            const col = input.getAttribute('data-col');
-            insertData[col] = input.value;
+            if (!input.disabled) {
+                const col = input.getAttribute('data-col');
+                insertData[col] = input.value;
+            }
         });
         const cols = Object.keys(insertData).map(k => `"${k}"`).join(', ');
         const vals = Object.keys(insertData).map(() => '?').join(', ');
         sql = `INSERT INTO "${table}" (${cols}) VALUES (${vals})`;
-        data.values = Object.values(insertData); // temporary for params
+        data.values = Object.values(insertData);
     }
 
     try {
@@ -780,11 +792,15 @@ function addColumnRow(name = '', type = 'TEXT', pk = false, nullable = true) {
         </td>
         <td class="p-2">
             <select class="col-type w-full px-2 py-1.5 bg-white border border-slate-200 rounded outline-none focus:border-[#3ecf8e] text-[12px] font-medium">
-                <option value="INTEGER" ${type === 'INTEGER' ? 'selected' : ''}>INTEGER</option>
-                <option value="TEXT" ${type === 'TEXT' ? 'selected' : ''}>TEXT</option>
-                <option value="REAL" ${type === 'REAL' ? 'selected' : ''}>REAL</option>
-                <option value="BLOB" ${type === 'BLOB' ? 'selected' : ''}>BLOB</option>
+                <option value="INTEGER" ${type === 'INTEGER' ? 'selected' : ''}>INTEGER (ID, Numbers)</option>
+                <option value="TEXT" ${type === 'TEXT' ? 'selected' : ''}>TEXT (Long String)</option>
+                <option value="VARCHAR(255)" ${type.startsWith('VARCHAR') ? 'selected' : ''}>VARCHAR (String)</option>
+                <option value="BOOLEAN" ${type === 'BOOLEAN' ? 'selected' : ''}>BOOLEAN (True/False)</option>
+                <option value="DATE" ${type === 'DATE' ? 'selected' : ''}>DATE</option>
                 <option value="DATETIME" ${type === 'DATETIME' ? 'selected' : ''}>DATETIME</option>
+                <option value="REAL" ${type === 'REAL' ? 'selected' : ''}>REAL (Decimal)</option>
+                <option value="NUMERIC" ${type === 'NUMERIC' ? 'selected' : ''}>NUMERIC</option>
+                <option value="BLOB" ${type === 'BLOB' ? 'selected' : ''}>BLOB (Binary)</option>
             </select>
         </td>
         <td class="p-2 text-center">
