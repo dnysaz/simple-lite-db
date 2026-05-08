@@ -204,7 +204,13 @@
                                 Query Editor
                                 <span id="sqlTargetDb" class="text-[#3ecf8e] text-[10px] bg-white px-2 py-0.5 border border-[#3ecf8e]/20 rounded-full"></span>
                             </h2>
-                            <button onclick="runSql()" class="px-4 py-1.5 btn-primary rounded-md text-[11px] uppercase tracking-widest shadow-sm">Execute</button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="showCreateTable()" class="px-4 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-md text-[11px] font-bold hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    CREATE TABLE
+                                </button>
+                                <button onclick="runSql()" class="px-4 py-1.5 btn-primary rounded-md text-[11px] uppercase tracking-widest shadow-sm">Execute</button>
+                            </div>
                         </div>
                         <textarea id="sqlInput" class="w-full h-48 p-6 font-mono text-[14px] outline-none border-none bg-transparent resize-none text-slate-700" placeholder="SELECT * FROM users"></textarea>
                     </div>

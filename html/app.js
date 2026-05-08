@@ -1022,8 +1022,18 @@ async function submitCreateDb() {
 }
 
 function showCreateTable(db, apiKey) {
-    currentActive = { db, table: '', apiKey };
-    el('currentDbName').innerText = db;
+    const activeDb = db || currentActive.db;
+    const activeKey = apiKey || currentActive.apiKey;
+
+    if (!activeDb) {
+        showNotify("Error", "Please select a database first", "error");
+        return;
+    }
+
+    currentActive.db = activeDb;
+    currentActive.apiKey = activeKey;
+    
+    el('currentDbName').innerText = activeDb;
     el('newTableName').value = '';
     el('columnList').innerHTML = '';
     // Initial PK column
