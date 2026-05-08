@@ -142,6 +142,25 @@ git clone https://github.com/dnysaz/simple-lite-db
                             <strong>Security Tip:</strong> For production use, we highly recommend using <strong>HTTPS</strong>. You can easily set up a reverse proxy using <strong>Nginx</strong> or <strong>Caddy</strong> with Let's Encrypt to secure your data transmission.
                         </p>
                     </div>
+
+                    <div class="mt-12 bg-slate-900 rounded-[2rem] p-10 shadow-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-[#3ecf8e] opacity-[0.03] -mr-32 -mt-32 rounded-full group-hover:scale-110 transition-transform duration-700"></div>
+                        <h3 class="text-2xl font-black text-white mb-4">🖥️ Admin Dashboard (Desktop Version)</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                            To manage your databases visually, you can access the powerful Admin Dashboard directly from your web browser. This is the central hub for all your SQLite management needs.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-white/5 border border-white/10 p-4 rounded-xl">
+                                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">DASHBOARD URL</span>
+                                <code class="text-white text-sm">http://YOUR_VPS_IP:5117/dashboard</code>
+                            </div>
+                            <div class="bg-white/5 border border-white/10 p-4 rounded-xl">
+                                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest block mb-1">CREDENTIALS</span>
+                                <p class="text-slate-400 text-xs">Use the <code>DASHBOARD_USER</code> and <code>DASHBOARD_PASS</code> defined in your <code>.env</code> file.</p>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- API -->
