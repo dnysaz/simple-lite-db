@@ -960,7 +960,7 @@ async function processTerminalCommand(cmd) {
     const output = el('terminal-output');
     const log = (msg, type = 'res') => {
         const div = document.createElement('div');
-        div.className = `mb-2 ${type === 'cmd' ? 'text-slate-500 mt-4' : type === 'error' ? 'text-rose-500' : type === 'success' ? 'text-[#3ecf8e]' : 'text-slate-300'}`;
+        div.className = `mb-2 ${type === 'cmd' ? 'text-slate-400 mt-4' : type === 'error' ? 'text-red-600 font-bold' : type === 'success' ? 'text-[#3ecf8e] font-bold' : 'text-slate-700'}`;
         div.innerHTML = msg;
         output.appendChild(div);
         output.scrollTop = output.scrollHeight;
@@ -973,22 +973,22 @@ async function processTerminalCommand(cmd) {
 
     if (upper === 'HELP') {
         log(`
-<span class="text-[#3ecf8e] font-bold">SimpleLiteDB Shell v1.0.0</span>
+<span class="text-slate-900 font-bold text-base">SimpleLiteDB Shell v1.0.0</span>
 Type SQLite commands directly or use the administrative helpers below.
 
-<span class="text-sky-400 font-bold">--- ADMIN COMMANDS ---</span>
-  <span class="text-white">LIST DATABASES</span>           Show all databases and their API keys.
-  <span class="text-white">USE &lt;db_name&gt;</span>            Switch the active database context.
-  <span class="text-white">CREATE DATABASE &lt;name&gt;</span>   Initialize a new SQLite database instance.
-  <span class="text-white">DELETE DATABASE &lt;name&gt;</span>   Permanently delete a database and its key.
+<span class="text-blue-600 font-bold">--- ADMIN COMMANDS ---</span>
+  <span class="text-slate-900 font-bold">LIST DATABASES</span>           Show all databases and their API keys.
+  <span class="text-slate-900 font-bold">USE &lt;db_name&gt;</span>            Switch the active database context.
+  <span class="text-slate-900 font-bold">CREATE DATABASE &lt;name&gt;</span>   Initialize a new SQLite database instance.
+  <span class="text-slate-900 font-bold">DELETE DATABASE &lt;name&gt;</span>   Permanently delete a database and its key.
 
-<span class="text-emerald-400 font-bold">--- SQL COMMANDS ---</span>
+<span class="text-emerald-600 font-bold">--- SQL COMMANDS ---</span>
   Supports standard SQLite syntax (SELECT, INSERT, UPDATE, etc.)
-  Example: <span class="text-slate-500">SELECT * FROM users;</span>
+  Example: <span class="text-slate-400">SELECT * FROM users;</span>
 
-<span class="text-slate-400 font-bold">--- SYSTEM ---</span>
-  <span class="text-white">CLEAR</span>                    Clear the terminal screen.
-  <span class="text-white">HELP</span>                     Show this menu.
+<span class="text-slate-500 font-bold">--- SYSTEM ---</span>
+  <span class="text-slate-900 font-bold">CLEAR</span>                    Clear the terminal screen.
+  <span class="text-slate-900 font-bold">HELP</span>                     Show this menu.
         `);
     } else if (upper === 'CLEAR') {
         output.innerHTML = '';
@@ -1012,13 +1012,13 @@ async function listDatabasesTerminal(log) {
         const res = await fetch('/admin/databases', { headers: { 'Authorization': `Bearer ${token}` } });
         const d = await res.json();
         if (d.success) {
-            let table = `<table class="w-full border-collapse border border-slate-800 text-[11px] mt-2">
-                <tr class="bg-slate-800/50">
-                    <th class="border border-slate-800 p-2 text-left">DB Name</th>
-                    <th class="border border-slate-800 p-2 text-left">API Key</th>
+            let table = `<table class="w-full border-collapse border border-slate-200 text-[11px] mt-2 bg-white rounded-lg overflow-hidden shadow-sm">
+                <tr class="bg-slate-100">
+                    <th class="border border-slate-200 p-2 text-left text-slate-900 font-bold">DB Name</th>
+                    <th class="border border-slate-200 p-2 text-left text-slate-900 font-bold">API Key</th>
                 </tr>`;
             d.databases.forEach(db => {
-                table += `<tr><td class="border border-slate-800 p-2">${db.name}</td><td class="border border-slate-800 p-2 text-slate-500 font-mono">${db.api_key}</td></tr>`;
+                table += `<tr class="hover:bg-slate-50"><td class="border border-slate-200 p-2 text-slate-700 font-medium">${db.name}</td><td class="border border-slate-200 p-2 text-slate-400 font-mono text-[10px]">${db.api_key}</td></tr>`;
             });
             table += `</table>`;
             log(table);
@@ -1089,13 +1089,13 @@ async function runSqlTerminal(sql, log) {
         if (d.success) {
             if (d.rows && d.rows.length > 0) {
                 const cols = Object.keys(d.rows[0]);
-                let table = `<table class="w-full border-collapse border border-slate-800 text-[11px] mt-2">
-                    <tr class="bg-slate-800/50">`;
-                cols.forEach(c => table += `<th class="border border-slate-800 p-2 text-left">${c}</th>`);
+                let table = `<table class="w-full border-collapse border border-slate-200 text-[11px] mt-2 bg-white rounded-lg overflow-hidden shadow-sm">
+                    <tr class="bg-slate-100 text-slate-900">`;
+                cols.forEach(c => table += `<th class="border border-slate-200 p-2 text-left font-bold">${c}</th>`);
                 table += `</tr>`;
                 d.rows.forEach(r => {
-                    table += `<tr>`;
-                    cols.forEach(c => table += `<td class="border border-slate-800 p-2 font-mono">${r[c]}</td>`);
+                    table += `<tr class="hover:bg-slate-50">`;
+                    cols.forEach(c => table += `<td class="border border-slate-200 p-2 font-mono text-slate-600">${r[c] !== null ? r[c] : '<span class="text-slate-300">null</span>'}</td>`);
                     table += `</tr>`;
                 });
                 table += `</table>`;
