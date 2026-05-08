@@ -187,7 +187,7 @@ function showApiView() {
                 <code class="text-[#3ecf8e] font-mono text-xs">${db}</code>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Authorization</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Authorization Header</span>
                 <div class="flex items-center justify-between">
                     <code class="text-slate-900 font-mono text-xs break-all">Bearer ${apiKey}</code>
                     <button onclick="copyCode(this, 'Bearer ${apiKey}')" class="text-slate-400 hover:text-[#3ecf8e] transition-colors ml-2">
@@ -197,30 +197,55 @@ function showApiView() {
             </div>
         </div>
 
-        <div class="space-y-16 pt-12 border-t border-slate-50">
+        <div class="pt-8 space-y-16">
+            <!-- Environment Setup -->
+            <div class="bg-slate-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.25-2.25"/></svg>
+                    Security Best Practice: Environment Variables
+                </h3>
+                <p class="text-slate-400 text-sm mb-6 max-w-2xl">Jangan pernah melakukan hardcode API Key di dalam kode Anda. Simpan kredensial di file <code class="text-[#3ecf8e]">.env</code> untuk mencegah kebocoran data.</p>
+                <div class="code-block bg-white/5 border-white/10 p-6 group">
+                    <button onclick="copyBlock(this)" class="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-md text-white opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        COPY .ENV
+                    </button>
+                    <pre class="text-emerald-400 font-mono text-sm leading-relaxed">SLITE_URL=${baseUrl}&#10;SLITE_API_KEY=${apiKey}&#10;SLITE_DB=${db}</pre>
+                </div>
+            </div>
+
             <!-- Vanilla JS -->
             <div>
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-6 bg-yellow-400 rounded-full"></span>
-                    Vanilla JavaScript (Fetch)
+                    Vanilla JavaScript (Async/Await)
                 </h3>
                 <div class="code-block group">
-                    <span class="code-badge">JS / FETCH</span>
+                    <span class="code-badge">JavaScript</span>
                     <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        COPY
+                        COPY CODE
                     </button>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
-  method: <span class="text-[#475569]">'POST'</span>,
-  headers: {
-    <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>,
-    <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>
-  },
-  body: <span class="text-[#0284c7]">JSON</span>.stringify({
-    database: <span class="text-[#475569]">'${db}'</span>,
-    sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
-  })
-}).then(res => res.json()).then(console.log);</pre>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">async function</span> <span class="text-[#0284c7]">queryDatabase</span>() {
+  <span class="text-[#2563eb]">const</span> response = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>(<span class="text-[#475569]">'${baseUrl}/query'</span>, {
+    method: <span class="text-[#475569]">'POST'</span>,
+    headers: {
+      <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>,
+      <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>
+    },
+    body: <span class="text-[#0284c7]">JSON</span>.stringify({
+      database: <span class="text-[#475569]">'${db}'</span>,
+      sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
+    })
+  });
+  
+  <span class="text-[#2563eb]">if</span> (!response.ok) <span class="text-[#2563eb]">throw new Error</span>(<span class="text-[#475569]">'Request Failed'</span>);
+  <span class="text-[#2563eb]">const</span> data = <span class="text-[#2563eb]">await</span> response.json();
+  <span class="text-[#0284c7]">console</span>.log(data);
+}</pre>
                 </div>
             </div>
 
@@ -228,27 +253,31 @@ function showApiView() {
             <div>
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-6 bg-slate-900 rounded-full"></span>
-                    Next.js Implementation (Server Action / Component)
+                    Next.js Server Side (Best Practice)
                 </h3>
                 <div class="code-block group">
-                    <span class="code-badge">React / Server Side</span>
+                    <span class="code-badge">Next.js</span>
                     <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        COPY
+                        COPY CODE
                     </button>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">const</span> res = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
-  method: <span class="text-[#475569]">'POST'</span>,
-  headers: {
-    <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
-    <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>
-  },
-  body: <span class="text-[#0284c7]">JSON</span>.stringify({
-    database: <span class="text-[#475569]">'${db}'</span>,
-    sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
-  }),
-  cache: <span class="text-[#475569]">'no-store'</span>
-});
-<span class="text-[#2563eb]">const</span> data = <span class="text-[#2563eb]">await</span> res.json();</pre>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">export async function</span> <span class="text-[#0284c7]">getData</span>() {
+  <span class="text-[#2563eb]">const</span> res = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>(<span class="text-[#475569]">\`$\{process.env.SLITE_URL\}/query\`</span>, {
+    method: <span class="text-[#475569]">'POST'</span>,
+    headers: {
+      <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
+      <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>
+    },
+    body: <span class="text-[#0284c7]">JSON</span>.stringify({
+      database: <span class="text-[#475569]">'${db}'</span>,
+      sql: <span class="text-[#475569]">'SELECT * FROM ${table || 'your_table'}'</span>
+    }),
+    cache: <span class="text-[#475569]">'no-store'</span>
+  });
+
+  <span class="text-[#2563eb]">if</span> (!res.ok) <span class="text-[#2563eb]">return</span> { success: <span class="text-[#2563eb]">false</span> };
+  <span class="text-[#2563eb]">return</span> res.json();
+}</pre>
                 </div>
             </div>
 
@@ -256,24 +285,32 @@ function showApiView() {
             <div>
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
-                    Python (Requests)
+                    Python 3 (Environment Based)
                 </h3>
                 <div class="code-block group">
-                    <span class="code-badge">Python 3</span>
+                    <span class="code-badge">Python</span>
                     <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        COPY
+                        COPY CODE
                     </button>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">import</span> requests
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">import</span> os, requests
+<span class="text-[#2563eb]">from</span> dotenv <span class="text-[#2563eb]">import</span> load_dotenv
 
-res = requests.post('${baseUrl}/query', 
-  headers={<span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>},
-  json={
-    <span class="text-[#0284c7]">'database'</span>: <span class="text-[#475569]">'${db}'</span>,
-    <span class="text-[#0284c7]">'sql'</span>: <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
-  }
+load_dotenv() <span class="text-slate-400"># Load .env file</span>
+
+URL = os.getenv(<span class="text-[#475569]">'SLITE_URL'</span>)
+KEY = os.getenv(<span class="text-[#475569]">'SLITE_API_KEY'</span>)
+
+response = requests.post(
+    <span class="text-[#475569]">f"{URL}/query"</span>, 
+    headers={<span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">f"Bearer {KEY}"</span>},
+    json={
+        <span class="text-[#0284c7]">'database'</span>: <span class="text-[#475569]">'${db}'</span>,
+        <span class="text-[#0284c7]">'sql'</span>: <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
+    }
 )
-<span class="text-[#0284c7]">print</span>(res.json())</pre>
+response.raise_for_status() <span class="text-slate-400"># Check for errors</span>
+<span class="text-[#0284c7]">print</span>(response.json())</pre>
                 </div>
             </div>
 
@@ -281,25 +318,32 @@ res = requests.post('${baseUrl}/query',
             <div>
                 <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <span class="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-                    PHP (cURL)
+                    PHP / cURL (Secure)
                 </h3>
                 <div class="code-block group">
-                    <span class="code-badge">PHP / CURL</span>
+                    <span class="code-badge">PHP</span>
                     <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                        COPY
+                        COPY CODE
                     </button>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#475569]">$ch</span> = curl_init('${baseUrl}/query');
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#475569]">$url</span> = <span class="text-[#0284c7]">getenv</span>(<span class="text-[#475569]">'SLITE_URL'</span>);
+<span class="text-[#475569]">$key</span> = <span class="text-[#0284c7]">getenv</span>(<span class="text-[#475569]">'SLITE_API_KEY'</span>);
+
+<span class="text-[#475569]">$ch</span> = curl_init(<span class="text-[#475569]">$url</span> . <span class="text-[#475569]">'/query'</span>);
+curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#2563eb]">true</span>);
+curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_POST, <span class="text-[#2563eb]">true</span>);
 curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_POSTFIELDS, json_encode([
   <span class="text-[#0284c7]">'database'</span> => <span class="text-[#475569]">'${db}'</span>,
   <span class="text-[#0284c7]">'sql'</span> => <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
 ]));
 curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_HTTPHEADER, [
-  <span class="text-[#475569]">'Authorization: Bearer ${apiKey}'</span>,
+  <span class="text-[#475569]">'Authorization: Bearer '</span> . <span class="text-[#475569]">$key</span>,
   <span class="text-[#475569]">'Content-Type: application/json'</span>
 ]);
-curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#2563eb]">true</span>);
-<span class="text-[#475569]">$response</span> = curl_exec(<span class="text-[#475569]">$ch</span>);</pre>
+
+<span class="text-[#475569]">$response</span> = curl_exec(<span class="text-[#475569]">$ch</span>);
+<span class="text-[#2563eb]">if</span> (curl_errno(<span class="text-[#475569]">$ch</span>)) <span class="text-[#2563eb]">echo</span> <span class="text-[#475569]">'Error:'</span> . curl_error(<span class="text-[#475569]">$ch</span>);
+curl_close(<span class="text-[#475569]">$ch</span>);</pre>
                 </div>
             </div>
         </div>
