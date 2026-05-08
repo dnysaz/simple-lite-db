@@ -38,7 +38,7 @@ SimpleLiteDB is a comprehensive web-based management tool and HTTP API service f
    ```
 
 3. **Open the Dashboard**:
-   Visit `http://localhost:5117/dashboard` in your browser.
+   Visit `http://YOUR_VPS_IP:5117/dashboard` in your browser.
 
 ## 🛠️ CLI Management
 
