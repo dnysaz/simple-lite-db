@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SimpleLiteDB | Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <link rel="stylesheet" href="/html/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -26,11 +27,12 @@
                 </div>
                 <span class="font-bold text-slate-900 text-sm tracking-tight">SimpleLiteDB</span>
             </div>
-            <nav class="flex items-center gap-1">
-                <button onclick="switchView('view-welcome')" class="nav-link active">Overview</button>
-                <button onclick="showSqlTab()" class="nav-link">SQL Editor</button>
-                <button class="nav-link">Settings</button>
-            </nav>
+                <div class="flex items-center bg-slate-100 p-1 rounded-lg">
+                    <button onclick="switchView('view-welcome')" class="nav-link px-4 py-1.5 text-[11px] font-bold rounded-md transition-all active">Overview</button>
+                    <button onclick="showSqlTab()" class="nav-link px-4 py-1.5 text-[11px] font-bold rounded-md transition-all">SQL Console</button>
+                    <button onclick="showRelationView()" class="nav-link px-4 py-1.5 text-[11px] font-bold rounded-md transition-all">Schema Map</button>
+                    <button onclick="showApiView()" class="nav-link px-4 py-1.5 text-[11px] font-bold rounded-md transition-all">API Docs</button>
+                </div>
         </div>
         <div class="flex items-center gap-4">
             <div id="userDisplay" class="text-[11px] font-semibold text-slate-500 bg-slate-50 border border-slate-100 px-3 py-1 rounded-md"></div>
@@ -189,7 +191,18 @@
                     <div id="sqlResult" class="bg-white border border-slate-100 rounded-xl overflow-hidden hidden shadow-sm"></div>
                 </div>
 
-                <!-- API Docs View (The "New Page") -->
+                <!-- Relation Map View -->
+                <div id="view-relation" class="hidden p-12 max-w-7xl mx-auto animate-in fade-in duration-300">
+                    <div class="mb-12">
+                        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Schema Map</h1>
+                        <p class="text-slate-400 text-sm mt-2">Visualizing relationships and table structures in <span id="relDbName" class="text-[#3ecf8e] font-bold"></span></p>
+                    </div>
+                    <div class="bg-white border border-slate-100 rounded-2xl shadow-sm p-12 flex justify-center overflow-auto custom-scrollbar min-h-[600px]">
+                        <div id="mermaid-container" class="w-full"></div>
+                    </div>
+                </div>
+
+                <!-- API Docs View -->
                 <div id="view-api" class="hidden p-12 max-w-6xl mx-auto animate-in fade-in duration-300">
                     <div class="flex items-center gap-4 mb-12">
                         <button onclick="switchBackFromApi()" class="p-2 hover:bg-slate-100 rounded-full text-slate-400 transition-all">

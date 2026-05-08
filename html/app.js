@@ -85,12 +85,12 @@ async function renderSidebar() {
 
 // --- 4. Views & Actions ---
 function switchView(viewId) {
-    if (viewId !== 'view-api') lastView = viewId;
-    ['view-welcome', 'view-table', 'view-sql', 'view-api'].forEach(id => el(id).classList.add('hidden'));
+    if (viewId !== 'view-api' && viewId !== 'view-relation') lastView = viewId;
+    ['view-welcome', 'view-table', 'view-sql', 'view-api', 'view-relation'].forEach(id => el(id).classList.add('hidden'));
     el(viewId).classList.remove('hidden');
     
     // Toggle Top Action Bar
-    if (viewId === 'view-table' || viewId === 'view-sql') {
+    if (viewId === 'view-table' || viewId === 'view-sql' || viewId === 'view-relation') {
         el('viewActions').classList.remove('hidden');
     } else {
         el('viewActions').classList.add('hidden');
@@ -99,6 +99,77 @@ function switchView(viewId) {
     document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
     if (viewId === 'view-welcome') document.querySelectorAll('.nav-link')[0].classList.add('active');
     if (viewId === 'view-sql') document.querySelectorAll('.nav-link')[1].classList.add('active');
+    if (viewId === 'view-relation') document.querySelectorAll('.nav-link')[2].classList.add('active');
+    if (viewId === 'view-api') document.querySelectorAll('.nav-link')[3].classList.add('active');
+}
+
+async function showRelationView() {
+    const { db, apiKey } = currentActive;
+    if (!db) return alert("Please select a database first.");
+    
+    el('relDbName').innerText = db;
+    switchView('view-relation');
+    el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> ${db} <span class="text-slate-300 font-normal">/</span> <span class="text-slate-900">schema map</span>`;
+    
+    el('mermaid-container').innerHTML = '<div class="flex items-center justify-center p-20"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3ecf8e]"></div></div>';
+
+    try {
+        // 1. Get all tables
+        const resTables = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ database: db, sql: "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'" })
+        });
+        const tablesData = await resTables.json();
+        const tables = (tablesData.rows || []).map(r => r.name);
+
+        let erString = "erDiagram\n";
+        let relationships = "";
+
+        // 2. Process each table
+        for (const table of tables) {
+            // Get Columns
+            const resInfo = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
+            });
+            const infoData = await resInfo.json();
+            const cols = infoData.rows || [];
+
+            erString += `    "${table}" {\n`;
+            for (const c of cols) {
+                const type = c.type.toLowerCase().replace(/[^a-z]/g, '');
+                erString += `        ${type} ${c.name} ${c.pk ? 'PK' : ''}\n`;
+            }
+            erString += `    }\n`;
+
+            // Get Foreign Keys
+            const resFK = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ database: db, sql: `PRAGMA foreign_key_list("${table}")` })
+            });
+            const fkData = await resFK.json();
+            const fks = fkData.rows || [];
+
+            for (const fk of fks) {
+                relationships += `    "${table}" }o--|| "${fk.table}" : "fk_${fk.from}"\n`;
+            }
+        }
+
+        erString += relationships;
+
+        // 3. Render
+        const container = el('mermaid-container');
+        container.innerHTML = `<pre class="mermaid">${erString}</pre>`;
+        
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+        await mermaid.run();
+
+    } catch (err) {
+        el('mermaid-container').innerHTML = `<div class="p-8 text-red-500 font-medium">Failed to generate schema map: ${err.message}</div>`;
+    }
 }
 
 function switchTableTab(tab) {
