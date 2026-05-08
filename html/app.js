@@ -235,11 +235,15 @@ function addNewColumnRow(c = null) {
         </td>
         <td class="px-4 py-3">
             <select class="col-type w-full px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:border-[#3ecf8e]">
-                <option value="TEXT" ${c && c.type === 'TEXT' ? 'selected' : ''}>TEXT</option>
-                <option value="INTEGER" ${c && c.type === 'INTEGER' ? 'selected' : ''}>INTEGER</option>
-                <option value="REAL" ${c && c.type === 'REAL' ? 'selected' : ''}>REAL</option>
+                <option value="INTEGER" ${c && c.type.startsWith('INT') ? 'selected' : ''}>INTEGER (ID, Numbers)</option>
+                <option value="TEXT" ${c && c.type === 'TEXT' ? 'selected' : ''}>TEXT (Long String)</option>
+                <option value="VARCHAR" ${c && c.type.startsWith('VAR') ? 'selected' : ''}>VARCHAR (String)</option>
+                <option value="BOOLEAN" ${c && c.type === 'BOOLEAN' ? 'selected' : ''}>BOOLEAN (True/False)</option>
+                <option value="DATE" ${c && c.type === 'DATE' ? 'selected' : ''}>DATE</option>
                 <option value="DATETIME" ${c && c.type === 'DATETIME' ? 'selected' : ''}>DATETIME</option>
-                <option value="BOOLEAN" ${c && c.type === 'BOOLEAN' ? 'selected' : ''}>BOOLEAN</option>
+                <option value="REAL" ${c && c.type === 'REAL' ? 'selected' : ''}>REAL (Decimal)</option>
+                <option value="NUMERIC" ${c && c.type === 'NUMERIC' ? 'selected' : ''}>NUMERIC</option>
+                <option value="BLOB" ${c && c.type === 'BLOB' ? 'selected' : ''}>BLOB (Binary)</option>
             </select>
         </td>
         <td class="px-4 py-3 text-center">

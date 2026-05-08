@@ -19,10 +19,14 @@ def execute(database, sql, params=[]):
     
     try:
         cur = conn.cursor()
-        cur.execute(sql, params)
         
-        # Ambil hasil jika ada
-        rows = cur.fetchall()
+        # Multi-statement support (e.g. for schema migration)
+        if ";" in sql:
+            cur.executescript(sql)
+            rows = []
+        else:
+            cur.execute(sql, params)
+            rows = cur.fetchall()
         
         # Commit perubahan
         conn.commit()
