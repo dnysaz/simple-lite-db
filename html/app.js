@@ -908,3 +908,204 @@ async function submitCreateTable() {
         showNotify("Failed", err.message, "error");
     }
 }
+
+// --- 9. Integrated Terminal View ---
+let terminalHistory = [];
+let terminalHistoryIdx = -1;
+let isTerminalInitialized = false;
+
+function showTerminalView() {
+    switchView('view-terminal');
+    if (!isTerminalInitialized) {
+        initTerminal();
+        isTerminalInitialized = true;
+        // Auto show help
+        processTerminalCommand('HELP');
+    }
+    el('terminal-input').focus();
+}
+
+function initTerminal() {
+    const input = el('terminal-input');
+    input.addEventListener('keydown', async (e) => {
+        if (e.key === 'Enter') {
+            const cmd = input.value.trim();
+            if (!cmd) return;
+            
+            terminalHistory.push(cmd);
+            terminalHistoryIdx = terminalHistory.length;
+            input.value = '';
+            
+            await processTerminalCommand(cmd);
+        } else if (e.key === 'ArrowUp') {
+            if (terminalHistoryIdx > 0) {
+                terminalHistoryIdx--;
+                input.value = terminalHistory[terminalHistoryIdx];
+            }
+            e.preventDefault();
+        } else if (e.key === 'ArrowDown') {
+            if (terminalHistoryIdx < terminalHistory.length - 1) {
+                terminalHistoryIdx++;
+                input.value = terminalHistory[terminalHistoryIdx];
+            } else {
+                terminalHistoryIdx = terminalHistory.length;
+                input.value = '';
+            }
+            e.preventDefault();
+        }
+    });
+}
+
+async function processTerminalCommand(cmd) {
+    const output = el('terminal-output');
+    const log = (msg, type = 'res') => {
+        const div = document.createElement('div');
+        div.className = `mb-2 ${type === 'cmd' ? 'text-slate-500 mt-4' : type === 'error' ? 'text-rose-500' : type === 'success' ? 'text-[#3ecf8e]' : 'text-slate-300'}`;
+        div.innerHTML = msg;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+    };
+
+    log(`slite> ${cmd}`, 'cmd');
+    
+    const upper = cmd.toUpperCase().trim();
+    const parts = cmd.split(' ');
+
+    if (upper === 'HELP') {
+        log(`
+<span class="text-white font-bold">SimpleLiteDB Interactive Terminal</span>
+--------------------------------------------------
+<span class="text-sky-400">Database Management:</span>
+  LIST DATABASES             - Show all databases & keys
+  USE &lt;db_name&gt;              - Switch active database
+  CREATE DATABASE &lt;name&gt;     - Initialize new DB
+  DELETE DATABASE &lt;name&gt;     - Delete DB & Key
+  
+<span class="text-emerald-400">Standard SQLite Commands:</span>
+  SELECT, INSERT, UPDATE, DELETE, CREATE TABLE, etc.
+  (Execute standard SQL directly on the active DB)
+
+<span class="text-slate-400">Other:</span>
+  CLEAR                      - Clear terminal history
+  HELP                       - Show this guide
+--------------------------------------------------
+        `);
+    } else if (upper === 'CLEAR') {
+        output.innerHTML = '';
+    } else if (upper === 'LIST DATABASES') {
+        await listDatabasesTerminal(log);
+    } else if (upper.startsWith('USE ')) {
+        await useDatabaseTerminal(parts[1], log);
+    } else if (upper.startsWith('CREATE DATABASE ')) {
+        await createDatabaseTerminal(parts[2], log);
+    } else if (upper.startsWith('DELETE DATABASE ')) {
+        await deleteDatabaseTerminal(parts[2], log);
+    } else {
+        // Standard SQL
+        await runSqlTerminal(cmd, log);
+    }
+}
+
+async function listDatabasesTerminal(log) {
+    const token = localStorage.getItem('slite_token');
+    try {
+        const res = await fetch('/admin/databases', { headers: { 'Authorization': `Bearer ${token}` } });
+        const d = await res.json();
+        if (d.success) {
+            let table = `<table class="w-full border-collapse border border-slate-800 text-[11px] mt-2">
+                <tr class="bg-slate-800/50">
+                    <th class="border border-slate-800 p-2 text-left">DB Name</th>
+                    <th class="border border-slate-800 p-2 text-left">API Key</th>
+                </tr>`;
+            d.databases.forEach(db => {
+                table += `<tr><td class="border border-slate-800 p-2">${db.name}</td><td class="border border-slate-800 p-2 text-slate-500 font-mono">${db.api_key}</td></tr>`;
+            });
+            table += `</table>`;
+            log(table);
+        } else log(d.error, 'error');
+    } catch (e) { log(e.message, 'error'); }
+}
+
+async function useDatabaseTerminal(name, log) {
+    if (!name) return log("Error: Specify database name", "error");
+    const token = localStorage.getItem('slite_token');
+    try {
+        const res = await fetch('/admin/databases', { headers: { 'Authorization': `Bearer ${token}` } });
+        const d = await res.json();
+        const db = d.databases.find(x => x.name.toLowerCase() === name.toLowerCase());
+        if (db) {
+            currentActive = { db: db.name, table: '', apiKey: db.api_key };
+            renderSidebar();
+            log(`Active context: <span class="text-white">${db.name}</span>`, 'success');
+        } else log(`Database '${name}' not found.`, 'error');
+    } catch (e) { log(e.message, 'error'); }
+}
+
+async function createDatabaseTerminal(name, log) {
+    if (!name) return log("Error: Specify database name", "error");
+    const token = localStorage.getItem('slite_token');
+    try {
+        const res = await fetch('/admin/create_db', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name })
+        });
+        const d = await res.json();
+        if (d.success) {
+            log(`Database '${d.name}' created successfully.`, 'success');
+            loadAllDatabases();
+        } else log(d.error, 'error');
+    } catch (e) { log(e.message, 'error'); }
+}
+
+async function deleteDatabaseTerminal(name, log) {
+    if (!name) return log("Error: Specify database name", "error");
+    if (!confirm(`Delete database '${name}'? This cannot be undone.`)) return;
+    const token = localStorage.getItem('slite_token');
+    try {
+        const res = await fetch('/admin/delete_db', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ name })
+        });
+        const d = await res.json();
+        if (d.success) {
+            log(`Database '${name}' deleted.`, 'success');
+            loadAllDatabases();
+        } else log(d.error, 'error');
+    } catch (e) { log(e.message, 'error'); }
+}
+
+async function runSqlTerminal(sql, log) {
+    const { db, apiKey } = currentActive;
+    if (!db) return log("Error: No database selected. Use 'USE &lt;db_name&gt;' first.", "error");
+    try {
+        const res = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ database: db, sql })
+        });
+        const d = await res.json();
+        if (d.success) {
+            if (d.rows && d.rows.length > 0) {
+                const cols = Object.keys(d.rows[0]);
+                let table = `<table class="w-full border-collapse border border-slate-800 text-[11px] mt-2">
+                    <tr class="bg-slate-800/50">`;
+                cols.forEach(c => table += `<th class="border border-slate-800 p-2 text-left">${c}</th>`);
+                table += `</tr>`;
+                d.rows.forEach(r => {
+                    table += `<tr>`;
+                    cols.forEach(c => table += `<td class="border border-slate-800 p-2 font-mono">${r[c]}</td>`);
+                    table += `</tr>`;
+                });
+                table += `</table>`;
+                log(table);
+            } else log("Query OK. 0 rows returned.", "success");
+            
+            // Refresh sidebar if schema changed
+            if (sql.toUpperCase().match(/CREATE|DROP|ALTER/)) {
+                loadAllDatabases();
+            }
+        } else log(d.error, 'error');
+    } catch (e) { log(e.message, 'error'); }
+}
