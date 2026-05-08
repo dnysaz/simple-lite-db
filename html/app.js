@@ -452,8 +452,52 @@ function showSqlTab(dbName = '', apiKey = '') {
     el('sqlTargetDb').innerText = `${currentActive.db || 'Select Database'}`;
     el('sqlResult').innerHTML = '';
     el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> sql console`;
+    updateSqlTableList();
     switchView('view-sql');
     renderSidebar();
+}
+
+async function updateSqlTableList() {
+    const listEl = el('sql-table-list');
+    if (!listEl) return;
+    if (!currentActive.db) {
+        listEl.innerHTML = '<span class="text-slate-300 text-[10px] italic">Please select a database from the sidebar</span>';
+        return;
+    }
+
+    try {
+        const res = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentActive.apiKey}` },
+            body: JSON.stringify({ database: currentActive.db, sql: "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'" })
+        });
+        const data = await res.json();
+        const tables = data.rows || [];
+        
+        if (tables.length === 0) {
+            listEl.innerHTML = '<span class="text-slate-300 text-[10px] italic">No tables in this database</span>';
+            return;
+        }
+
+        listEl.innerHTML = '<span class="text-[9px] font-black text-slate-300 uppercase tracking-tighter mr-2 pt-1">Tables:</span>' + 
+            tables.map(t => `
+            <button onclick="insertTableName('${t.name}')" class="px-2 py-0.5 bg-white border border-slate-100 rounded text-[10px] font-bold text-slate-500 hover:border-[#3ecf8e] hover:text-[#3ecf8e] transition-all">
+                ${t.name}
+            </button>
+        `).join('');
+    } catch (e) {
+        listEl.innerHTML = '<span class="text-red-300 text-[10px] italic">Failed to load tables</span>';
+    }
+}
+
+function insertTableName(name) {
+    const input = el('sqlInput');
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const text = input.value;
+    input.value = text.substring(0, start) + name + text.substring(end);
+    input.focus();
+    input.selectionStart = input.selectionEnd = start + name.length;
 }
 
 async function refreshTableData() {
