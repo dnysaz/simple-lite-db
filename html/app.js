@@ -120,7 +120,7 @@ async function renderSidebar() {
 
         // Home Grid Html
         gridHtml += `
-            <div class="group bg-white border border-slate-100 p-6 rounded-2xl shadow-sm hover:shadow-xl hover:border-[#3ecf8e]/40 transition-all cursor-pointer" onclick="showSqlTab('${db.name}', '${db.api_key}')">
+            <div class="group bg-white border border-slate-100 p-6 rounded-2xl hover:bg-emerald-50/10 hover:border-[#3ecf8e] transition-all cursor-pointer" onclick="showSqlTab('${db.name}', '${db.api_key}')">
                 <div class="flex justify-between items-start mb-6">
                     <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-[#3ecf8e]/10 group-hover:text-[#3ecf8e] transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
@@ -144,11 +144,14 @@ async function renderSidebar() {
     const gridContainer = el('db-grid-content');
     if (gridContainer) {
         gridContainer.innerHTML = gridHtml || `
-            <div class="col-span-full py-20 text-center">
-                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+            <div class="col-span-full py-16 text-center border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50/50">
+                <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300 border border-slate-100">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
                 </div>
-                <p class="text-slate-400 text-sm font-medium">No databases found. Create your first one to get started!</p>
+                <p class="text-slate-500 text-sm font-bold mb-6">No databases found.</p>
+                <button onclick="showCreateDb()" class="px-6 py-2.5 bg-[#3ecf8e] hover:bg-[#34b27b] text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-200 transition-all active:scale-95">
+                    + CREATE FIRST DATABASE
+                </button>
             </div>
         `;
     }
