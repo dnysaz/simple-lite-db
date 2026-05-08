@@ -192,17 +192,18 @@ async function showRelationView() {
 
         // 3. Render
         const container = el('mermaid-container');
-        container.innerHTML = `<div id="mermaid-parent" class="w-full h-[600px] border border-slate-100 rounded-xl bg-slate-50/30 overflow-hidden cursor-move">
-            <pre class="mermaid">${erString}</pre>
+        container.innerHTML = `<div id="mermaid-parent" class="w-full h-[800px] border border-slate-100 rounded-xl bg-slate-50/20 overflow-hidden cursor-move relative">
+            <pre class="mermaid w-full h-full">${erString}</pre>
         </div>`;
         
         mermaid.initialize({ 
             startOnLoad: true, 
             theme: 'base',
+            er: { useMaxWidth: false },
             themeVariables: {
                 primaryColor: '#ffffff',
                 primaryTextColor: '#0f172a',
-                primaryBorderColor: '#e2e8f0',
+                primaryBorderColor: '#cbd5e1',
                 lineColor: '#3ecf8e',
                 secondaryColor: '#f8fafc',
                 tertiaryColor: '#ffffff'
@@ -214,16 +215,22 @@ async function showRelationView() {
         // 4. Initialize Pan/Zoom
         const svg = container.querySelector('svg');
         if (svg) {
-            svg.style.width = '100%';
-            svg.style.height = '100%';
-            svgPanZoom(svg, {
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.style.maxWidth = '100%';
+            
+            const panZoom = svgPanZoom(svg, {
                 zoomEnabled: true,
                 controlIconsEnabled: true,
                 fit: true,
                 center: true,
                 minZoom: 0.1,
-                maxZoom: 10
+                maxZoom: 20,
+                refreshRate: 'auto'
             });
+
+            // Re-fit on window resize
+            window.addEventListener('resize', () => panZoom.resize());
         }
 
     } catch (err) {
