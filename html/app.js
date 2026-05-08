@@ -402,8 +402,8 @@ async function submitRow() {
         const col = input.getAttribute('data-col');
         if (!input.disabled) {
             updateData[col] = input.value;
+            insertData[col] = input.value;
         }
-        insertData[col] = input.value;
     });
 
     let sql = "";
