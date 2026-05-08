@@ -141,6 +141,33 @@ async def admin_create_db(req: CreateDbRequest, authorization: Optional[str] = H
     
     return {"success": True, "name": db_name, "api_key": api_key}
 
+class DeleteDbRequest(BaseModel):
+    name: str
+
+@app.post("/admin/delete_db")
+async def admin_delete_db(req: DeleteDbRequest, authorization: Optional[str] = Header(None)):
+    if authorization != f"Bearer {os.getenv('DASHBOARD_PASS')}":
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    db_name = req.name.strip().lower()
+    db_path = f"data/{db_name}.db"
+    
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        
+        # Clean up .env (optional but recommended)
+        env_key = f"KEY_{db_name.upper().replace('-', '_')}="
+        if os.path.exists(".env"):
+            with open(".env", "r") as f:
+                lines = f.readlines()
+            with open(".env", "w") as f:
+                for line in lines:
+                    if not line.startswith(env_key):
+                        f.write(line)
+        
+        return {"success": True}
+    return {"success": False, "error": "Database not found"}
+
 @app.get("/dashboard", response_class=HTMLResponse)
 @app.get("/dashboard/", response_class=HTMLResponse)
 async def get_dashboard():

@@ -58,9 +58,14 @@ async function renderSidebar() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-400 group-hover:text-slate-600'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
                     <span class="truncate">${db.name}</span>
                 </div>
-                <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-slate-100 border border-slate-200 rounded transition-all" title="New Table">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
+                <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="p-0.5 hover:bg-emerald-50 text-emerald-600 border border-transparent hover:border-emerald-200 rounded transition-all" title="New Table">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </button>
+                    <button onclick="event.stopPropagation(); confirmDeleteDb('${db.name}')" class="p-0.5 hover:bg-red-50 text-red-500 border border-transparent hover:border-red-200 rounded transition-all" title="Delete Database">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                </div>
             </div>
             <div class="mt-0.5">
                 ${tables.map(t => {
@@ -96,10 +101,25 @@ function switchView(viewId) {
     if (viewId === 'view-sql') document.querySelectorAll('.nav-link')[1].classList.add('active');
 }
 
+function switchTableTab(tab) {
+    if (tab === 'data') {
+        el('tab-data').className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-slate-900 shadow-sm";
+        el('tab-settings').className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-slate-400 hover:text-slate-600";
+        el('table-data-content').classList.remove('hidden');
+        el('table-settings-content').classList.add('hidden');
+    } else {
+        el('tab-settings').className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-slate-900 shadow-sm";
+        el('tab-data').className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-slate-400 hover:text-slate-600";
+        el('table-settings-content').classList.remove('hidden');
+        el('table-data-content').classList.add('hidden');
+    }
+}
+
 async function showTable(db, table, apiKey) {
     currentActive = { db, table, apiKey };
     el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> ${db} <span class="text-slate-300 font-normal">/</span> <span class="text-slate-900">${table}</span>`;
     el('tableTitle').innerText = table;
+    switchTableTab('data');
     switchView('view-table');
     refreshTableData();
     renderSidebar(); 
@@ -121,7 +141,7 @@ async function refreshTableData() {
         const res = await fetch('/query', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            body: JSON.stringify({ database: db, sql: `SELECT * FROM ${table} LIMIT 100` })
+            body: JSON.stringify({ database: db, sql: `SELECT * FROM "${table}" LIMIT 100` })
         });
         const data = await res.json();
         renderGrid(data.rows, el('thead'), el('tbody'));
@@ -398,7 +418,88 @@ function switchBackFromApi() {
     switchView(lastView);
 }
 
-// --- 6. Creation Modals ---
+// --- 6. Confirmation Logic ---
+function showConfirm(title, text, onConfirm) {
+    el('confirmTitle').innerText = title;
+    el('confirmText').innerText = text;
+    el('confirmModal').classList.remove('hidden');
+    el('confirmBtn').onclick = () => {
+        onConfirm();
+        el('confirmModal').classList.add('hidden');
+    };
+}
+
+// --- 7. Table Alterations & Deletion ---
+async function submitAddColumn() {
+    const colName = el('addColName').value.trim();
+    const colType = el('addColType').value;
+    const { db, table, apiKey } = currentActive;
+
+    if (!colName) return alert("Column name is required.");
+
+    const sql = `ALTER TABLE "${table}" ADD COLUMN ${colName} ${colType}`;
+    try {
+        const res = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ database: db, sql })
+        });
+        const data = await res.json();
+        if (data.success) {
+            el('addColName').value = '';
+            refreshTableData();
+            alert("Column added successfully!");
+        } else alert("Error: " + data.error);
+    } catch (err) { alert(err.message); }
+}
+
+function confirmDeleteTable() {
+    const { db, table, apiKey } = currentActive;
+    showConfirm(
+        "Drop Table", 
+        `Are you sure you want to delete table '${table}'? All data will be lost forever.`, 
+        async () => {
+            const sql = `DROP TABLE "${table}"`;
+            try {
+                const res = await fetch('/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({ database: db, sql })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentActive.table = '';
+                    loadAllDatabases();
+                    switchView('view-welcome');
+                } else alert("Error: " + data.error);
+            } catch (err) { alert(err.message); }
+        }
+    );
+}
+
+function confirmDeleteDb(name) {
+    showConfirm(
+        "Delete Database", 
+        `Are you sure you want to delete database '${name}'? This will delete the actual .db file and its API key.`, 
+        async () => {
+            try {
+                const res = await fetch('/admin/delete_db', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${dashToken}` },
+                    body: JSON.stringify({ name })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (currentActive.db === name) currentActive = { db: '', table: '', apiKey: '' };
+                    loadAllDatabases();
+                    switchView('view-welcome');
+                } else alert("Error: " + data.error);
+            } catch (err) { alert(err.message); }
+        }
+    );
+}
+
+// --- 8. Creation Modals ---
 function showCreateDb() {
     el('newDbName').value = '';
     el('createDbModal').classList.remove('hidden');
