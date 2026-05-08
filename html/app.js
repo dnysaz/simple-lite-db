@@ -199,21 +199,21 @@ function showApiView() {
 
         <div class="pt-8 space-y-16">
             <!-- Environment Setup -->
-            <div class="bg-slate-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-8 opacity-10">
+            <div class="bg-emerald-50/50 rounded-2xl p-8 border border-emerald-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-8 opacity-5 text-emerald-600">
                     <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <h3 class="text-lg font-bold mb-2 flex items-center gap-2">
+                <h3 class="text-lg font-bold mb-2 flex items-center gap-2 text-slate-900">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.25-2.25"/></svg>
                     Security Best Practice: Environment Variables
                 </h3>
-                <p class="text-slate-400 text-sm mb-6 max-w-2xl">Jangan pernah melakukan hardcode API Key di dalam kode Anda. Simpan kredensial di file <code class="text-[#3ecf8e]">.env</code> untuk mencegah kebocoran data.</p>
-                <div class="code-block bg-white/5 border-white/10 p-6 group">
-                    <button onclick="copyBlock(this)" class="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-md text-white opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                <p class="text-slate-500 text-sm mb-6 max-w-2xl">Never hardcode your API Key directly in your code. Store credentials in a <code class="text-emerald-600 font-bold">.env</code> file to prevent data leaks and maintain security.</p>
+                <div class="code-block bg-white border-emerald-100 p-6 group shadow-none">
+                    <button onclick="copyBlock(this)" class="absolute top-4 right-4 p-2 bg-white hover:bg-emerald-50 border border-emerald-100 rounded-md text-emerald-600 opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold shadow-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                         COPY .ENV
                     </button>
-                    <pre class="text-emerald-400 font-mono text-sm leading-relaxed">SLITE_URL=${baseUrl}&#10;SLITE_API_KEY=${apiKey}&#10;SLITE_DB=${db}</pre>
+                    <pre class="text-emerald-700 font-mono text-sm leading-relaxed font-bold">SLITE_URL=${baseUrl}&#10;SLITE_API_KEY=${apiKey}&#10;SLITE_DB=${db}</pre>
                 </div>
             </div>
 
