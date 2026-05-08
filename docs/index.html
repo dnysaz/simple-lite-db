@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleLiteDB | Documentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .bg-grid { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 32px 32px; }
+        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.6); }
+        .gradient-text { background: linear-gradient(135deg, #059669 0%, #3ecf8e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] text-slate-800">
+
+    <!-- Hero Section -->
+    <header class="relative overflow-hidden pt-16 pb-24 bg-grid">
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <nav class="flex items-center justify-between mb-20">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-[#3ecf8e] rounded-xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    </div>
+                    <span class="text-xl font-extrabold tracking-tight text-slate-900">SimpleLiteDB</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <a href="https://github.com/dnysaz/simple-lite-db" class="text-sm font-bold text-slate-600 hover:text-emerald-600 transition-colors">GitHub</a>
+                    <a href="#setup" class="px-5 py-2 bg-slate-900 text-white rounded-full text-xs font-bold shadow-xl shadow-slate-200 hover:scale-105 transition-transform">Get Started</a>
+                </div>
+            </nav>
+
+            <div class="max-w-3xl">
+                <h1 class="text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-6">
+                    The Smart Way to <span class="gradient-text">Manage SQLite</span> over HTTP.
+                </h1>
+                <p class="text-xl text-slate-500 font-medium leading-relaxed mb-10">
+                    A powerful, lightweight, and modern management suite for SQLite. SimpleLiteDB transforms your local database into a robust HTTP service with a premium web dashboard.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <div class="px-4 py-2 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center gap-2">
+                        <span class="w-2 h-2 bg-[#3ecf8e] rounded-full animate-pulse"></span>
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-widest">Active Engine: v2.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 -mt-12 mb-32 relative z-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Side Navigation -->
+            <aside class="space-y-6">
+                <div class="glass-card p-6 rounded-2xl sticky top-8">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Introduction</h4>
+                    <ul class="space-y-4">
+                        <li><a href="#what" class="text-sm font-bold text-emerald-600 flex items-center gap-2"><span>Apa itu SimpleLiteDB?</span></a></li>
+                        <li><a href="#why" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Kenapa Dibuat?</a></li>
+                        <li><a href="#for" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Untuk Apa?</a></li>
+                    </ul>
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-10 mb-6">Getting Started</h4>
+                    <ul class="space-y-4">
+                        <li><a href="#setup" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Cara Instalasi</a></li>
+                        <li><a href="#api" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Menggunakan API</a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- Documentation Body -->
+            <div class="md:col-span-2 space-y-24">
+                
+                <!-- What -->
+                <section id="what" class="scroll-mt-10">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Apa itu SimpleLiteDB?</h2>
+                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4">
+                        <p>SimpleLiteDB adalah <strong>Database Management Suite</strong> berbasis web yang dirancang khusus untuk SQLite. Aplikasi ini bertindak sebagai jembatan (bridge) yang mengubah database SQLite lokal Anda menjadi layanan HTTP yang bisa diakses dari mana saja secara aman.</p>
+                        <p>Bukan sekadar penampil data biasa, SimpleLiteDB menyediakan antarmuka modern (Dashboard), Terminal interaktif, dan Visualisasi Relasi (Schema Map) dalam satu paket ringan.</p>
+                    </div>
+                </section>
+
+                <!-- Why -->
+                <section id="why" class="scroll-mt-10">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Kenapa Dibuat?</h2>
+                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4">
+                        <p>Banyak developer menghadapi masalah saat ingin menggunakan SQLite di lingkungan remote (VPS) atau ingin membagikan akses database tanpa memberikan akses SSH penuh.</p>
+                        <p>SimpleLiteDB dibuat untuk:</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>Menghilangkan Kerumitan</strong>: Tidak perlu menginstal software client database yang berat.</li>
+                            <li><strong>Aksesibilitas</strong>: Mengelola database cukup melalui browser.</li>
+                            <li><strong>Modernisasi</strong>: Memberikan pengalaman manajemen database ala SaaS (seperti Supabase atau PlanetScale) namun untuk SQLite yang jauh lebih hemat sumber daya.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- For What -->
+                <section id="for" class="scroll-mt-10">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Untuk Apa?</h2>
+                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4 text-sm bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                            <div class="space-y-3">
+                                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base">Backend Sederhana</h3>
+                                <p>Sangat cocok untuk aplikasi web kecil, IoT, atau aplikasi mobile yang butuh database cloud tanpa ribet.</p>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <h3 class="font-bold text-slate-900 text-base">Shared Access</h3>
+                                <p>Berbagi akses database ke tim melalui API Key unik per database tanpa resiko keamanan sistem.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Setup -->
+                <section id="setup" class="scroll-mt-10">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Cara Instalasi</h2>
+                    <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl overflow-hidden relative">
+                        <div class="flex gap-1.5 mb-6">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                        </div>
+                        <pre class="text-emerald-400 font-mono text-sm leading-relaxed">
+<span class="text-slate-500"># 1. Clone repository</span>
+git clone https://github.com/dnysaz/simple-lite-db
+
+<span class="text-slate-500"># 2. Inisialisasi Environment</span>
+./slite init
+
+<span class="text-slate-500"># 3. Jalankan Service</span>
+./slite start db</pre>
+                    </div>
+                </section>
+
+                <!-- API -->
+                <section id="api" class="scroll-mt-10">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Menggunakan API</h2>
+                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-6">
+                        <p>Setelah database dibuat, Anda bisa langsung memanggilnya dari aplikasi apapun menggunakan request HTTP POST sederhana.</p>
+                        <div class="p-6 bg-white rounded-2xl border border-slate-100 italic text-slate-500 text-sm">
+                            "Bawa SQLite ke level Cloud dengan satu baris kode."
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-100 py-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">&copy; 2026 SimpleLiteDB Open Source Project</p>
+        </div>
+    </footer>
+
+</body>
+</html>
