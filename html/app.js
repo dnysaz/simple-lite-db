@@ -87,6 +87,9 @@ async function renderSidebar() {
                         <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="p-0.5 hover:bg-emerald-50 text-emerald-600 border border-transparent hover:border-emerald-200 rounded transition-all" title="New Table">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
+                        <button onclick="event.stopPropagation(); confirmDeleteDb('${db.name}')" class="p-0.5 hover:bg-red-50 text-red-500 border border-transparent hover:border-red-200 rounded transition-all" title="Delete Database">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
                     </div>
                 </div>
                 
