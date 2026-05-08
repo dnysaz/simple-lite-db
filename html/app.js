@@ -983,6 +983,8 @@ Type SQLite commands directly or use the administrative helpers below.
   <span class="text-slate-900 font-bold">DELETE DATABASE &lt;name&gt;</span>   Permanently delete a database and its key.
 
 <span class="text-emerald-600 font-bold">--- SQL COMMANDS ---</span>
+  <span class="text-slate-900 font-bold">LIST TABLES</span>              Show all tables in active DB.
+  <span class="text-slate-900 font-bold">DESC &lt;table_name&gt;</span>         Show columns/schema of a table.
   Supports standard SQLite syntax (SELECT, INSERT, UPDATE, etc.)
   Example: <span class="text-slate-400">SELECT * FROM users;</span>
 
@@ -992,8 +994,10 @@ Type SQLite commands directly or use the administrative helpers below.
         `);
     } else if (upper === 'CLEAR') {
         output.innerHTML = '';
-    } else if (upper === 'LIST DATABASES') {
-        await listDatabasesTerminal(log);
+    } else if (upper === 'LIST TABLES') {
+        await runSqlTerminal(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`, log);
+    } else if (upper.startsWith('DESC ')) {
+        await runSqlTerminal(`PRAGMA table_info("${parts[1]}")`, log);
     } else if (upper.startsWith('USE ')) {
         await useDatabaseTerminal(parts[1], log);
     } else if (upper.startsWith('CREATE DATABASE ')) {
