@@ -6,6 +6,15 @@ let lastView = 'view-welcome';
 
 const el = (id) => document.getElementById(id);
 
+function formatBytes(bytes, decimals = 2) {
+    if (!bytes || bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 // --- 1. Initialization ---
 if (dashToken) {
     el('userDisplay').innerText = localStorage.getItem('slite_user') || 'Admin';
@@ -65,6 +74,7 @@ async function renderSidebar() {
 
     const list = el('sidebarContent');
     let finalHtml = '';
+    let gridHtml = '';
 
     for (const db of dbData) {
         const isActiveDb = currentActive.db === db.name;
@@ -83,7 +93,7 @@ async function renderSidebar() {
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-400 group-hover:text-slate-600'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
                         <span class="truncate font-medium text-slate-700">${db.name}</span>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-2">
+                    <div class="flex items-center gap-1 transition-all ml-2">
                         <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="p-0.5 hover:bg-emerald-50 text-emerald-600 border border-transparent hover:border-emerald-200 rounded transition-all" title="New Table">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
@@ -107,8 +117,42 @@ async function renderSidebar() {
                 </div>
             </div>
         `;
+
+        // Home Grid Html
+        gridHtml += `
+            <div class="group bg-white border border-slate-100 p-6 rounded-2xl shadow-sm hover:shadow-xl hover:border-[#3ecf8e]/40 transition-all cursor-pointer" onclick="showSqlTab('${db.name}', '${db.api_key}')">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-[#3ecf8e]/10 group-hover:text-[#3ecf8e] transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    </div>
+                    <div class="text-[10px] font-black text-slate-300 uppercase tracking-widest">${formatBytes(db.size)}</div>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-1 truncate">${db.name}</h3>
+                <p class="text-xs text-slate-400 font-medium">${db.tables.length} Tables</p>
+                <div class="mt-6 pt-4 border-t border-slate-50 flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all">OPEN DATABASE →</span>
+                    <button onclick="event.stopPropagation(); confirmDeleteDb('${db.name}')" class="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-lg transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `;
     }
-    list.innerHTML = finalHtml;
+
+    list.innerHTML = finalHtml || '<div class="p-8 text-center text-slate-400 text-xs italic">No databases created yet</div>';
+    
+    const gridContainer = el('db-grid-content');
+    if (gridContainer) {
+        gridContainer.innerHTML = gridHtml || `
+            <div class="col-span-full py-20 text-center">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
+                <p class="text-slate-400 text-sm font-medium">No databases found. Create your first one to get started!</p>
+            </div>
+        `;
+    }
+}
 }
 
 // --- 4. Views & Actions ---

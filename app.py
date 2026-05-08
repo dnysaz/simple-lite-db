@@ -106,7 +106,9 @@ async def admin_list_databases(authorization: Optional[str] = Header(None)):
                 # Cari API key di .env
                 env_key = f"KEY_{name.upper().replace('-', '_')}"
                 api_key = os.getenv(env_key, "No Key Found")
-                databases.append({"name": name, "api_key": api_key})
+                file_path = os.path.join("data", file)
+                size = os.path.getsize(file_path)
+                databases.append({"name": name, "api_key": api_key, "size": size})
     return {"success": True, "databases": databases}
 
 class CreateDbRequest(BaseModel):
