@@ -12,7 +12,7 @@ from database import execute
 # Load environment variables dari .env jika ada
 load_dotenv()
 
-app = FastAPI(title="SimpleLiteDB HTTP Service")
+app = FastAPI(title="SimpleLiteDB HTTP Service", docs_url=None, redoc_url=None)
 
 # Aktifkan CORS agar bisa dipanggil dari Vanilla JS/Browser
 app.add_middleware(
