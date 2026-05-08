@@ -542,7 +542,11 @@ async function runSql() {
         if (!data.success) throw new Error(data.error);
         el('sqlResult').classList.remove('hidden');
         el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead"></thead><tbody id="stbody" class="divide-y divide-slate-50"></tbody></table></div>';
-        renderGrid(data.rows, el('sthead'), el('stbody'));
+        
+        const rows = data.rows || [];
+        const cols = rows.length > 0 ? Object.keys(rows[0]).map(k => ({ name: k, type: '' })) : [];
+        
+        renderGrid(rows, cols, el('sthead'), el('stbody'));
         if (sql.toUpperCase().match(/CREATE|DROP|ALTER/)) loadAllDatabases();
     } catch (err) { showNotify("SQL Error", err.message, "error"); }
 }
