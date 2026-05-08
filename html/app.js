@@ -994,6 +994,8 @@ Type SQLite commands directly or use the administrative helpers below.
         `);
     } else if (upper === 'CLEAR') {
         output.innerHTML = '';
+    } else if (upper === 'LIST DATABASES') {
+        await listDatabasesTerminal(log);
     } else if (upper === 'LIST TABLES') {
         await runSqlTerminal(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'`, log);
     } else if (upper.startsWith('DESC ')) {
