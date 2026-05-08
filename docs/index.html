@@ -105,8 +105,10 @@
 
                 <!-- Setup -->
                 <section id="setup" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Quick Setup</h2>
-                    <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl overflow-hidden relative">
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Quick Setup on VPS</h2>
+                    <p class="text-slate-500 mb-6 text-sm">Deploy SimpleLiteDB on your VPS in minutes. The installation script automatically handles environment setup and firewall configuration.</p>
+                    
+                    <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl overflow-hidden relative mb-6">
                         <div class="flex gap-1.5 mb-6">
                             <div class="w-3 h-3 bg-red-500 rounded-full"></div>
                             <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
@@ -116,11 +118,20 @@
 <span class="text-slate-500"># 1. Clone repository</span>
 git clone https://github.com/dnysaz/simple-lite-db
 
-<span class="text-slate-500"># 2. Initialize Environment</span>
+<span class="text-slate-500"># 2. Initialize Environment & Firewall</span>
 ./slite init
 
 <span class="text-slate-500"># 3. Start Database Service</span>
 ./slite start db</pre>
+                    </div>
+
+                    <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex gap-3 items-start">
+                        <div class="mt-1 text-emerald-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <p class="text-xs text-emerald-800 font-medium leading-relaxed">
+                            <strong>Automatic Firewall:</strong> The <code>./slite init</code> command automatically detects and configures your <strong>UFW firewall</strong> to open port <code>5117</code>, allowing instant access to your dashboard and API.
+                        </p>
                     </div>
                 </section>
 
