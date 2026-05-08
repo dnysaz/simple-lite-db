@@ -973,22 +973,22 @@ async function processTerminalCommand(cmd) {
 
     if (upper === 'HELP') {
         log(`
-<span class="text-white font-bold">SimpleLiteDB Interactive Terminal</span>
---------------------------------------------------
-<span class="text-sky-400">Database Management:</span>
-  LIST DATABASES             - Show all databases & keys
-  USE &lt;db_name&gt;              - Switch active database
-  CREATE DATABASE &lt;name&gt;     - Initialize new DB
-  DELETE DATABASE &lt;name&gt;     - Delete DB & Key
-  
-<span class="text-emerald-400">Standard SQLite Commands:</span>
-  SELECT, INSERT, UPDATE, DELETE, CREATE TABLE, etc.
-  (Execute standard SQL directly on the active DB)
+<span class="text-[#3ecf8e] font-bold">SimpleLiteDB Shell v1.0.0</span>
+Type SQLite commands directly or use the administrative helpers below.
 
-<span class="text-slate-400">Other:</span>
-  CLEAR                      - Clear terminal history
-  HELP                       - Show this guide
---------------------------------------------------
+<span class="text-sky-400 font-bold">--- ADMIN COMMANDS ---</span>
+  <span class="text-white">LIST DATABASES</span>           Show all databases and their API keys.
+  <span class="text-white">USE &lt;db_name&gt;</span>            Switch the active database context.
+  <span class="text-white">CREATE DATABASE &lt;name&gt;</span>   Initialize a new SQLite database instance.
+  <span class="text-white">DELETE DATABASE &lt;name&gt;</span>   Permanently delete a database and its key.
+
+<span class="text-emerald-400 font-bold">--- SQL COMMANDS ---</span>
+  Supports standard SQLite syntax (SELECT, INSERT, UPDATE, etc.)
+  Example: <span class="text-slate-500">SELECT * FROM users;</span>
+
+<span class="text-slate-400 font-bold">--- SYSTEM ---</span>
+  <span class="text-white">CLEAR</span>                    Clear the terminal screen.
+  <span class="text-white">HELP</span>                     Show this menu.
         `);
     } else if (upper === 'CLEAR') {
         output.innerHTML = '';
