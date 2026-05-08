@@ -20,8 +20,9 @@ def execute(database, sql, params=[]):
     try:
         cur = conn.cursor()
         
-        # Multi-statement support (e.g. for schema migration)
-        if ";" in sql:
+        # Multi-statement support (detect if it's really a script)
+        sql_clean = sql.strip()
+        if sql_clean.count(';') > 1 or (';' in sql_clean and not sql_clean.endswith(';')):
             cur.executescript(sql)
             rows = []
         else:
