@@ -426,17 +426,72 @@ function showCreateTable(db, apiKey) {
     currentActive = { db, table: '', apiKey };
     el('currentDbName').innerText = db;
     el('newTableName').value = '';
-    el('newTableSql').value = 'id INTEGER PRIMARY KEY AUTOINCREMENT,\nname TEXT,\ncreated_at DATETIME DEFAULT CURRENT_TIMESTAMP';
+    el('columnList').innerHTML = '';
+    // Initial PK column
+    addColumnRow('id', 'INTEGER', true, false);
+    addColumnRow('name', 'TEXT', false, true);
     el('createTableModal').classList.remove('hidden');
 }
 
-async function submitCreateTable() {
-    const table = el('newTableName').value.trim();
-    const cols = el('newTableSql').value.trim();
-    const { db, apiKey } = currentActive;
-    if (!table || !cols) return alert("Table name and structure are required.");
+function addColumnRow(name = '', type = 'TEXT', pk = false, nullable = true) {
+    const tr = document.createElement('tr');
+    tr.className = "border-b border-slate-100 last:border-0 group";
+    tr.innerHTML = `
+        <td class="p-2">
+            <input type="text" class="col-name w-full px-3 py-1.5 bg-white border border-slate-200 rounded outline-none focus:border-[#3ecf8e] text-[13px]" placeholder="column_name" value="${name}">
+        </td>
+        <td class="p-2">
+            <select class="col-type w-full px-2 py-1.5 bg-white border border-slate-200 rounded outline-none focus:border-[#3ecf8e] text-[12px] font-medium">
+                <option value="INTEGER" ${type === 'INTEGER' ? 'selected' : ''}>INTEGER</option>
+                <option value="TEXT" ${type === 'TEXT' ? 'selected' : ''}>TEXT</option>
+                <option value="REAL" ${type === 'REAL' ? 'selected' : ''}>REAL</option>
+                <option value="BLOB" ${type === 'BLOB' ? 'selected' : ''}>BLOB</option>
+                <option value="DATETIME" ${type === 'DATETIME' ? 'selected' : ''}>DATETIME</option>
+            </select>
+        </td>
+        <td class="p-2 text-center">
+            <input type="checkbox" class="col-pk w-4 h-4 rounded border-slate-300 text-[#3ecf8e] focus:ring-[#3ecf8e]" ${pk ? 'checked' : ''}>
+        </td>
+        <td class="p-2 text-center">
+            <input type="checkbox" class="col-nullable w-4 h-4 rounded border-slate-300 text-[#3ecf8e] focus:ring-[#3ecf8e]" ${nullable ? 'checked' : ''}>
+        </td>
+        <td class="p-2 text-center">
+            <button onclick="this.closest('tr').remove()" class="text-slate-300 hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </td>
+    `;
+    el('columnList').appendChild(tr);
+}
 
-    const sql = `CREATE TABLE ${table} (${cols})`;
+async function submitCreateTable() {
+    const tableName = el('newTableName').value.trim();
+    if (!tableName) return alert("Please enter a table name.");
+
+    const rows = Array.from(el('columnList').querySelectorAll('tr'));
+    if (rows.length === 0) return alert("Please add at least one column.");
+
+    const columnDefs = rows.map(tr => {
+        const name = tr.querySelector('.col-name').value.trim();
+        const type = tr.querySelector('.col-type').value;
+        const isPk = tr.querySelector('.col-pk').checked;
+        const isNullable = tr.querySelector('.col-nullable').checked;
+
+        if (!name) return null;
+
+        let def = `${name} ${type}`;
+        if (isPk) def += " PRIMARY KEY";
+        if (isPk && type === 'INTEGER') def += " AUTOINCREMENT";
+        if (!isNullable && !isPk) def += " NOT NULL";
+        
+        return def;
+    }).filter(d => d !== null);
+
+    if (columnDefs.length === 0) return alert("Please provide names for your columns.");
+
+    const sql = `CREATE TABLE "${tableName}" (\n  ${columnDefs.join(',\n  ')}\n)`;
+    
+    const { db, apiKey } = currentActive;
     try {
         const res = await fetch('/query', {
             method: 'POST',
@@ -447,7 +502,11 @@ async function submitCreateTable() {
         if (data.success) {
             el('createTableModal').classList.add('hidden');
             loadAllDatabases();
-            showTable(db, table, apiKey);
-        } else alert("Create Table Error: " + data.error);
-    } catch (err) { alert(err.message); }
+            showTable(db, tableName, apiKey);
+        } else {
+            alert("Create Table Error: " + data.error);
+        }
+    } catch (err) {
+        alert("Failed to create table: " + err.message);
+    }
 }
