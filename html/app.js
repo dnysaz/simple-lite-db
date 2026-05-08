@@ -452,9 +452,29 @@ function showSqlTab(dbName = '', apiKey = '') {
     el('sqlTargetDb').innerText = `${currentActive.db || 'Select Database'}`;
     el('sqlResult').innerHTML = '';
     el('breadcrumb').innerHTML = `<span class="text-slate-300 font-normal">/</span> sql console`;
+    renderSqlShortcuts();
     updateSqlTableList();
     switchView('view-sql');
     renderSidebar();
+}
+
+function renderSqlShortcuts() {
+    const container = el('sql-shortcuts');
+    if (!container) return;
+
+    const snippets = [
+        { label: 'SELECT', sql: 'SELECT * FROM table_name' },
+        { label: 'INSERT', sql: 'INSERT INTO table_name (col1, col2) VALUES (val1, val2)' },
+        { label: 'UPDATE', sql: 'UPDATE table_name SET col1 = val1 WHERE id = 1' },
+        { label: 'DELETE', sql: 'DELETE FROM table_name WHERE id = 1' },
+        { label: 'CREATE TABLE', sql: 'CREATE TABLE table_name (\n    id INTEGER PRIMARY KEY AUTOINCREMENT,\n    name TEXT\n)' }
+    ];
+
+    container.innerHTML = snippets.map(s => `
+        <button onclick="insertSql('${s.sql.replace(/\n/g, '\\n')}')" class="px-3 py-1 bg-slate-50 border border-slate-100 rounded text-[10px] font-black text-slate-400 hover:border-[#3ecf8e] hover:text-[#3ecf8e] hover:bg-white transition-all uppercase tracking-tighter">
+            ${s.label}
+        </button>
+    `).join('');
 }
 
 async function updateSqlTableList() {
@@ -479,53 +499,26 @@ async function updateSqlTableList() {
             return;
         }
 
-        // Fetch columns for each table
-        const tableDetails = await Promise.all(tables.map(async t => {
-            const resInfo = await fetch('/query', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${currentActive.apiKey}` },
-                body: JSON.stringify({ database: currentActive.db, sql: `PRAGMA table_info("${t.name}")` })
-            });
-            const infoData = await resInfo.json();
-            return { name: t.name, columns: infoData.rows || [] };
-        }));
-
-        listEl.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-6 py-6 border-t border-slate-50 bg-slate-50/10";
-        listEl.innerHTML = tableDetails.map(t => `
-            <div class="bg-white border border-slate-100 rounded-xl p-4 hover:border-[#3ecf8e] transition-all group">
-                <div class="flex items-center justify-between mb-3">
-                    <button onclick="insertTableName('${t.name}')" class="text-[12px] font-bold text-slate-900 hover:text-[#3ecf8e] transition-all flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                        ${t.name}
-                    </button>
-                    <span class="text-[9px] text-slate-300 font-bold uppercase">${t.columns.length} Cols</span>
-                </div>
-                <div class="space-y-1.5">
-                    ${t.columns.map(c => `
-                        <div class="flex items-center justify-between group/col cursor-pointer" onclick="insertTableName('${c.name}')">
-                            <span class="text-[11px] text-slate-500 group-hover/col:text-[#3ecf8e] transition-all flex items-center gap-1.5">
-                                ${c.pk ? '<span class="text-[8px] bg-amber-100 text-amber-600 px-1 rounded-sm font-black">PK</span>' : '<span class="w-1.5 h-1.5 rounded-full bg-slate-100"></span>'}
-                                ${c.name}
-                            </span>
-                            <span class="text-[9px] text-slate-300 font-mono italic">${c.type.toLowerCase()}</span>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
+        listEl.className = "flex flex-wrap gap-2 px-6 py-3 border-t border-slate-50 bg-slate-50/10";
+        listEl.innerHTML = '<span class="text-[9px] font-black text-slate-300 uppercase tracking-tighter mr-2 pt-1">Quick Select Table:</span>' + 
+            tables.map(t => `
+            <button onclick="insertSql('${t.name}')" class="px-2 py-0.5 bg-white border border-slate-100 rounded text-[10px] font-bold text-slate-500 hover:border-[#3ecf8e] hover:text-[#3ecf8e] transition-all">
+                ${t.name}
+            </button>
         `).join('');
     } catch (e) {
-        listEl.innerHTML = '<span class="text-red-300 text-[10px] italic">Failed to load schema details</span>';
+        listEl.innerHTML = '<span class="text-red-300 text-[10px] italic">Failed to load tables</span>';
     }
 }
 
-function insertTableName(name) {
+function insertSql(text) {
     const input = el('sqlInput');
     const start = input.selectionStart;
     const end = input.selectionEnd;
-    const text = input.value;
-    input.value = text.substring(0, start) + name + text.substring(end);
+    const currentText = input.value;
+    input.value = currentText.substring(0, start) + text + currentText.substring(end);
     input.focus();
-    input.selectionStart = input.selectionEnd = start + name.length;
+    input.selectionStart = input.selectionEnd = start + text.length;
 }
 
 async function refreshTableData() {
