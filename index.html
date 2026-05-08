@@ -143,40 +143,42 @@
                     </div>
 
                     <!-- Table Settings Tab -->
-                    <div id="table-settings-content" class="hidden p-12 max-w-4xl animate-in fade-in duration-300">
-                        <div class="space-y-12">
+                    <div id="table-settings-content" class="hidden p-12 max-w-5xl animate-in fade-in duration-300">
+                        <div class="space-y-8">
                             <div class="bg-white border border-slate-100 rounded-xl p-8 shadow-sm">
-                                <h3 class="text-lg font-bold text-slate-900 mb-2">Current Columns</h3>
-                                <p class="text-xs text-slate-400 mb-6">Manage existing columns in this table.</p>
-                                <div id="columnManagementList" class="divide-y divide-slate-50">
-                                    <!-- Populated via JS -->
+                                <div class="flex items-center justify-between mb-8">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-slate-900">Schema Editor</h3>
+                                        <p class="text-xs text-slate-400 mt-1">Reorder, rename, or change column types. System will recreate the table to apply complex changes.</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="addNewColumnRow()" class="px-4 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all rounded-lg font-bold text-xs">Add Column</button>
+                                        <button onclick="saveTableSchema()" class="px-6 py-2 btn-primary rounded-lg font-bold text-xs shadow-md">Save Schema</button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="bg-white border border-slate-100 rounded-xl p-8 shadow-sm">
-                                <h3 class="text-lg font-bold text-slate-900 mb-2">Add New Column</h3>
-                                <p class="text-xs text-slate-400 mb-6">Extend your table schema with a new column.</p>
-                                <div class="flex gap-3 items-end">
-                                    <div class="flex-1 space-y-2">
-                                        <label class="text-[10px] font-bold text-slate-400 uppercase">Column Name</label>
-                                        <input id="addColName" type="text" class="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] text-sm" placeholder="e.g. status">
-                                    </div>
-                                    <div class="w-40 space-y-2">
-                                        <label class="text-[10px] font-bold text-slate-400 uppercase">Type</label>
-                                        <select id="addColType" class="w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] text-sm">
-                                            <option value="TEXT">TEXT</option>
-                                            <option value="INTEGER">INTEGER</option>
-                                            <option value="REAL">REAL</option>
-                                            <option value="DATETIME">DATETIME</option>
-                                        </select>
-                                    </div>
-                                    <button onclick="submitAddColumn()" class="px-6 py-2 btn-primary rounded-lg font-bold text-xs h-[38px]">Add</button>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full border-collapse">
+                                        <thead>
+                                            <tr class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                                                <th class="px-4 py-3 text-center w-12">Order</th>
+                                                <th class="px-4 py-3 text-left">Name</th>
+                                                <th class="px-4 py-3 text-left w-48">Type</th>
+                                                <th class="px-4 py-3 text-center w-20">PK</th>
+                                                <th class="px-4 py-3 text-center w-20">Nullable</th>
+                                                <th class="px-4 py-3 text-center w-12"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="columnEditorList" class="divide-y divide-slate-50">
+                                            <!-- Populated via JS -->
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
                             <div class="bg-red-50 border border-red-100 rounded-xl p-8">
                                 <h3 class="text-lg font-bold text-red-900 mb-2">Danger Zone</h3>
-                                <p class="text-xs text-red-500/70 mb-6">Actions here are permanent and cannot be undone.</p>
+                                <p class="text-xs text-red-500/70 mb-6">Dropping a table is permanent and deletes all data.</p>
                                 <button onclick="confirmDeleteTable()" class="px-6 py-2.5 bg-white border border-red-200 text-red-600 hover:bg-red-600 hover:text-white transition-all rounded-lg font-bold text-xs shadow-sm">
                                     Drop Table
                                 </button>

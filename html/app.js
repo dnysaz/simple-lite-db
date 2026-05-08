@@ -213,37 +213,113 @@ async function loadColumnSettings() {
         const data = await res.json();
         const cols = data.rows || [];
         
-        el('columnManagementList').innerHTML = cols.map(c => `
-            <div class="flex items-center justify-between py-3 border-b border-slate-50 last:border-0">
-                <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 rounded-full ${c.pk ? 'bg-[#3ecf8e]' : 'bg-slate-200'}"></span>
-                    <span class="text-sm font-medium text-slate-700">${c.name}</span>
-                    <span class="text-[10px] text-slate-400 font-mono">(${c.type})</span>
-                </div>
-                <button onclick="deleteColumn('${c.name}')" class="p-1.5 text-slate-300 hover:text-red-500 transition-colors" title="Delete Column">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
-            </div>
-        `).join('');
+        el('columnEditorList').innerHTML = '';
+        cols.forEach(c => addNewColumnRow(c));
     } catch (e) { console.error(e); }
 }
 
-async function deleteColumn(colName) {
+function addNewColumnRow(c = null) {
+    const tr = document.createElement('tr');
+    tr.className = "group hover:bg-slate-50/50 transition-colors";
+    tr.dataset.originalName = c ? c.name : "";
+    
+    tr.innerHTML = `
+        <td class="px-4 py-3 text-center">
+            <div class="flex flex-col gap-1 items-center">
+                <button onclick="moveCol(this, -1)" class="p-1 text-slate-300 hover:text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+                <button onclick="moveCol(this, 1)" class="p-1 text-slate-300 hover:text-slate-600"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+            </div>
+        </td>
+        <td class="px-4 py-3">
+            <input type="text" class="col-name w-full px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:border-[#3ecf8e]" value="${c ? c.name : ''}" placeholder="column_name">
+        </td>
+        <td class="px-4 py-3">
+            <select class="col-type w-full px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-sm outline-none focus:border-[#3ecf8e]">
+                <option value="TEXT" ${c && c.type === 'TEXT' ? 'selected' : ''}>TEXT</option>
+                <option value="INTEGER" ${c && c.type === 'INTEGER' ? 'selected' : ''}>INTEGER</option>
+                <option value="REAL" ${c && c.type === 'REAL' ? 'selected' : ''}>REAL</option>
+                <option value="DATETIME" ${c && c.type === 'DATETIME' ? 'selected' : ''}>DATETIME</option>
+                <option value="BOOLEAN" ${c && c.type === 'BOOLEAN' ? 'selected' : ''}>BOOLEAN</option>
+            </select>
+        </td>
+        <td class="px-4 py-3 text-center">
+            <input type="checkbox" class="col-pk w-4 h-4 rounded border-slate-300 text-[#3ecf8e]" ${c && c.pk ? 'checked' : ''}>
+        </td>
+        <td class="px-4 py-3 text-center">
+            <input type="checkbox" class="col-null w-4 h-4 rounded border-slate-300 text-[#3ecf8e]" ${c && !c.notnull ? 'checked' : ''}>
+        </td>
+        <td class="px-4 py-3 text-center">
+            <button onclick="this.closest('tr').remove()" class="p-1.5 text-slate-300 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </td>
+    `;
+    el('columnEditorList').appendChild(tr);
+}
+
+function moveCol(btn, dir) {
+    const row = btn.closest('tr');
+    if (dir === -1 && row.previousElementSibling) row.parentNode.insertBefore(row, row.previousElementSibling);
+    if (dir === 1 && row.nextElementSibling) row.parentNode.insertBefore(row, row.nextElementSibling.nextElementSibling);
+}
+
+async function saveTableSchema() {
     const { db, table, apiKey } = currentActive;
-    showConfirm("Delete Column", `Are you sure you want to delete column '${colName}'? This action is permanent.`, async () => {
+    const rows = Array.from(el('columnEditorList').querySelectorAll('tr'));
+    
+    if (rows.length === 0) return showNotify("Error", "Table must have at least one column.", "error");
+
+    const newCols = rows.map(tr => ({
+        name: tr.querySelector('.col-name').value.trim(),
+        type: tr.querySelector('.col-type').value,
+        pk: tr.querySelector('.col-pk').checked,
+        notnull: !tr.querySelector('.col-null').checked,
+        oldName: tr.dataset.originalName
+    }));
+
+    if (newCols.some(c => !c.name)) return showNotify("Error", "All columns must have a name.", "error");
+
+    showConfirm("Apply Schema Changes", "This will recreate the table to apply changes. All existing data will be migrated.", async () => {
         try {
+            // 1. Build Create Table SQL
+            const colDefs = newCols.map(c => {
+                let d = `"${c.name}" ${c.type}`;
+                if (c.pk) d += " PRIMARY KEY";
+                if (c.pk && c.type === 'INTEGER') d += " AUTOINCREMENT";
+                if (c.notnull && !c.pk) d += " NOT NULL";
+                return d;
+            }).join(', ');
+
+            const tempTableName = `${table}_old_${Date.now()}`;
+            
+            // 2. Transaction Sequence
+            const sqlSequence = [
+                `PRAGMA foreign_keys=OFF`,
+                `BEGIN TRANSACTION`,
+                `ALTER TABLE "${table}" RENAME TO "${tempTableName}"`,
+                `CREATE TABLE "${table}" (${colDefs})`,
+                `INSERT INTO "${table}" (${newCols.map(c => `"${c.name}"`).join(', ')}) 
+                 SELECT ${newCols.map(c => c.oldName ? `"${c.oldName}"` : 'NULL').join(', ')} 
+                 FROM "${tempTableName}"`,
+                `DROP TABLE "${tempTableName}"`,
+                `COMMIT`,
+                `PRAGMA foreign_keys=ON`
+            ];
+
+            // Execute as one block if possible, or sequence
+            // For safety, we send them one by one or join with semicolon if API supports it
+            // Our /query endpoint supports single statements usually, but let's try joining
             const res = await fetch('/query', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({ database: db, sql: `ALTER TABLE "${table}" DROP COLUMN "${colName}"` })
+                body: JSON.stringify({ database: db, sql: sqlSequence.join('; ') })
             });
             const d = await res.json();
+            
             if (d.success) {
-                showNotify("Success", `Column '${colName}' deleted.`);
+                showNotify("Success", "Table schema updated successfully.");
                 loadColumnSettings();
                 refreshTableData();
             } else {
-                showNotify("Delete failed", d.error || d.detail, "error");
+                showNotify("Schema Update Failed", d.error || "Check your column names/types.", "error");
             }
         } catch (e) { showNotify("Error", e.message, "error"); }
     });
