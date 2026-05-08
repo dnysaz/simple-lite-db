@@ -306,22 +306,47 @@ curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_RETURNTRANSFER, <sp
     `;
 }
 
+async function doCopy(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+    } else {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+        }
+        document.body.removeChild(textArea);
+    }
+}
+
 async function copyCode(btn, text) {
-    await navigator.clipboard.writeText(text);
+    await doCopy(text);
     const original = btn.innerHTML;
     btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-    setTimeout(() => btn.innerHTML = original, 2000);
+    btn.classList.add('text-[#3ecf8e]');
+    setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('text-[#3ecf8e]');
+    }, 2000);
 }
 
 async function copyBlock(btn) {
     const pre = btn.parentElement.querySelector('pre');
-    await navigator.clipboard.writeText(pre.innerText);
+    await doCopy(pre.innerText);
     const original = btn.innerHTML;
     btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> COPIED';
-    btn.classList.add('text-[#3ecf8e]', 'border-[#3ecf8e]/30');
+    btn.classList.add('text-[#3ecf8e]', 'border-[#3ecf8e]/30', 'bg-emerald-50');
     setTimeout(() => {
         btn.innerHTML = original;
-        btn.classList.remove('text-[#3ecf8e]', 'border-[#3ecf8e]/30');
+        btn.classList.remove('text-[#3ecf8e]', 'border-[#3ecf8e]/30', 'bg-emerald-50');
     }, 2000);
 }
 
