@@ -272,6 +272,15 @@ async function refreshTableData() {
     const { db, table, apiKey } = currentActive;
     if (!db || !table) return;
     try {
+        // Fetch Schema first
+        const schemaRes = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
+        });
+        const schemaData = await schemaRes.json();
+        const schemaCols = schemaData.rows || [];
+
         // Fetch data
         const res = await fetch('/query', {
             method: 'POST',
@@ -279,44 +288,44 @@ async function refreshTableData() {
             body: JSON.stringify({ database: db, sql: `SELECT rowid AS _rowid_, * FROM "${table}" LIMIT 100` })
         });
         const data = await res.json();
-        
         let rows = data.rows || [];
-        let cols = [];
 
-        if (rows.length > 0) {
-            cols = Object.keys(rows[0]).filter(k => k !== '_rowid_');
-        } else {
-            // If empty, fetch column names via PRAGMA
-            const schemaRes = await fetch('/query', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
-            });
-            const schemaData = await schemaRes.json();
-            cols = (schemaData.rows || []).map(r => r.name);
-        }
-
-        renderGrid(rows, cols, el('thead'), el('tbody'));
+        renderGrid(rows, schemaCols, el('thead'), el('tbody'));
     } catch (err) { console.error(err); }
 }
 
-function renderGrid(rows, cols, thead, tbody) {
+function renderGrid(rows, schemaCols, thead, tbody) {
     // Header
     thead.innerHTML = `
         <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase font-bold">
-            ${cols.map(c => `<th class="px-6 py-3 border-r border-slate-100 last:border-0">${c}</th>`).join('')}
+            ${schemaCols.map(c => `
+                <th class="px-6 py-3 border-r border-slate-100 last:border-0">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-slate-900">${c.name}</span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[9px] text-slate-400 font-mono normal-case">${c.type}</span>
+                            ${c.pk ? '<span class="text-[8px] bg-emerald-100 text-[#3ecf8e] px-1 rounded">PK</span>' : ''}
+                            ${!c.notnull && !c.pk ? '<span class="text-[8px] text-slate-300 normal-case">null</span>' : ''}
+                        </div>
+                    </div>
+                </th>
+            `).join('')}
             <th class="px-6 py-3 w-20 text-center">Actions</th>
         </tr>
     `;
 
     if (!rows || rows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${cols.length + 1}" class="p-12 text-center text-slate-400 font-medium italic">Table is currently empty.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${schemaCols.length + 1}" class="p-12 text-center text-slate-400 font-medium italic">Table is currently empty.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = rows.map((r, idx) => `
         <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/20'} hover:bg-slate-50 transition-colors group">
-            ${cols.map(c => `<td class="px-6 py-3 border-r border-slate-100 last:border-0 truncate max-w-[300px] font-mono text-[12px] text-slate-600">${r[c] !== null ? r[c] : '<span class="text-slate-300">null</span>'}</td>`).join('')}
+            ${schemaCols.map(c => `
+                <td class="px-6 py-3 border-r border-slate-100 last:border-0 truncate max-w-[300px] font-mono text-[12px] text-slate-600">
+                    ${r[c.name] !== null ? r[c.name] : '<span class="text-slate-300 italic">null</span>'}
+                </td>
+            `).join('')}
             <td class="px-6 py-3 text-center">
                 <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
                     <button onclick='editRow(${JSON.stringify(r).replace(/'/g, "&apos;")})' class="p-1 text-slate-400 hover:text-blue-600" title="Edit">
