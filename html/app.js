@@ -34,6 +34,15 @@ async function loadAllDatabases() {
 }
 
 let sidebarRenderId = 0;
+let expandedDbs = new Set();
+
+function toggleDbNode(name, e) {
+    if (e) e.stopPropagation();
+    if (expandedDbs.has(name)) expandedDbs.delete(name);
+    else expandedDbs.add(name);
+    renderSidebar();
+}
+
 async function renderSidebar() {
     const myRenderId = ++sidebarRenderId;
     
@@ -52,7 +61,6 @@ async function renderSidebar() {
         }
     }));
 
-    // If another render started while we were fetching, ignore this one
     if (myRenderId !== sidebarRenderId) return;
 
     const list = el('sidebarContent');
@@ -60,29 +68,36 @@ async function renderSidebar() {
 
     for (const db of dbData) {
         const isActiveDb = currentActive.db === db.name;
+        const isExpanded = expandedDbs.has(db.name);
+
         finalHtml += `
             <div class="mb-1">
                 <div class="db-node ${isActiveDb ? 'active' : ''} group" onclick="showSqlTab('${db.name}', '${db.api_key}')">
-                    <div class="flex items-center gap-2 flex-1">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <button onclick="toggleDbNode('${db.name}', event)" class="p-0.5 hover:bg-slate-100 rounded transition-all text-slate-400">
+                            ${isExpanded ? 
+                                '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>' : 
+                                '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+                            }
+                        </button>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${isActiveDb ? 'text-[#3ecf8e]' : 'text-slate-400 group-hover:text-slate-600'}"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                        <span class="truncate">${db.name}</span>
+                        <span class="truncate font-medium text-slate-700">${db.name}</span>
                     </div>
-                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all ml-2">
                         <button onclick="event.stopPropagation(); showCreateTable('${db.name}', '${db.api_key}')" class="p-0.5 hover:bg-emerald-50 text-emerald-600 border border-transparent hover:border-emerald-200 rounded transition-all" title="New Table">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
-                        <button onclick="event.stopPropagation(); confirmDeleteDb('${db.name}')" class="p-0.5 hover:bg-red-50 text-red-500 border border-transparent hover:border-red-200 rounded transition-all" title="Delete Database">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                        </button>
                     </div>
                 </div>
-                <div class="mt-0.5">
+                
+                <div class="mt-0.5 ml-4 border-l border-slate-100 ${isExpanded ? '' : 'hidden'}">
+                    ${db.tables.length === 0 ? '<div class="px-6 py-1 text-[10px] text-slate-300 italic">No tables</div>' : ''}
                     ${db.tables.map(t => {
                         const isActiveTable = currentActive.db === db.name && currentActive.table === t.name;
                         return `
                         <div class="table-node ${isActiveTable ? 'active' : ''}" onclick="showTable('${db.name}', '${t.name}', '${db.api_key}')">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                            <span class="truncate">${t.name}</span>
+                            <span class="truncate text-slate-500">${t.name}</span>
                         </div>
                         `;
                     }).join('')}
