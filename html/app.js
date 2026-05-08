@@ -138,29 +138,151 @@ async function refreshTableData() {
     const { db, table, apiKey } = currentActive;
     if (!db || !table) return;
     try {
+        // Fetch data
         const res = await fetch('/query', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            body: JSON.stringify({ database: db, sql: `SELECT * FROM "${table}" LIMIT 100` })
+            body: JSON.stringify({ database: db, sql: `SELECT rowid, * FROM "${table}" LIMIT 100` })
         });
         const data = await res.json();
-        renderGrid(data.rows, el('thead'), el('tbody'));
-    } catch (err) { alert("Table refresh failed: " + err.message); }
+        
+        let rows = data.rows || [];
+        let cols = [];
+
+        if (rows.length > 0) {
+            cols = Object.keys(rows[0]).filter(k => k !== 'rowid');
+        } else {
+            // If empty, fetch column names via PRAGMA
+            const schemaRes = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
+            });
+            const schemaData = await schemaRes.json();
+            cols = (schemaData.rows || []).map(r => r.name);
+        }
+
+        renderGrid(rows, cols, el('thead'), el('tbody'));
+    } catch (err) { console.error(err); }
 }
 
-function renderGrid(rows, thead, tbody) {
+function renderGrid(rows, cols, thead, tbody) {
+    // Header
+    thead.innerHTML = `
+        <tr class="bg-slate-50 text-slate-500 text-[11px] uppercase font-bold">
+            ${cols.map(c => `<th class="px-6 py-3 border-r border-slate-100 last:border-0">${c}</th>`).join('')}
+            <th class="px-6 py-3 w-20 text-center">Actions</th>
+        </tr>
+    `;
+
     if (!rows || rows.length === 0) {
-        thead.innerHTML = '';
-        tbody.innerHTML = '<tr><td class="p-12 text-center text-slate-400 font-medium italic">Table is currently empty.</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="${cols.length + 1}" class="p-12 text-center text-slate-400 font-medium italic">Table is currently empty.</td></tr>`;
         return;
     }
-    const cols = Object.keys(rows[0]);
-    thead.innerHTML = `<tr>${cols.map(c => `<th class="border-r border-slate-50 last:border-0">${c}</th>`).join('')}</tr>`;
+
     tbody.innerHTML = rows.map((r, idx) => `
-        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/20'} hover:bg-slate-50 transition-colors">
-            ${cols.map(c => `<td class="border-r border-slate-50 last:border-0 truncate max-w-[300px] font-mono text-[12px]">${r[c]}</td>`).join('')}
+        <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/20'} hover:bg-slate-50 transition-colors group">
+            ${cols.map(c => `<td class="px-6 py-3 border-r border-slate-100 last:border-0 truncate max-w-[300px] font-mono text-[12px] text-slate-600">${r[c] !== null ? r[c] : '<span class="text-slate-300">null</span>'}</td>`).join('')}
+            <td class="px-6 py-3 text-center">
+                <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                    <button onclick='editRow(${JSON.stringify(r).replace(/'/g, "&apos;")})' class="p-1 text-slate-400 hover:text-blue-600" title="Edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button onclick="deleteRow(${r.rowid})" class="p-1 text-slate-400 hover:text-red-600" title="Delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    </button>
+                </div>
+            </td>
         </tr>
     `).join('');
+}
+
+// --- CRUD Operations ---
+let editingRowId = null;
+
+async function showRowModal(existingData = null) {
+    const { db, table, apiKey } = currentActive;
+    el('rowModalTable').innerText = table;
+    el('rowModalTitle').innerText = existingData ? 'Edit Row' : 'Insert Row';
+    editingRowId = existingData ? existingData.rowid : null;
+
+    // Get columns
+    const res = await fetch('/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
+    });
+    const data = await res.json();
+    const cols = data.rows || [];
+
+    el('rowFields').innerHTML = cols.map(c => `
+        <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${c.name} <span class="text-slate-300 font-normal">(${c.type})</span></label>
+            <input type="text" data-col="${c.name}" class="row-input w-full px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg outline-none focus:border-[#3ecf8e] text-sm" 
+                value="${existingData ? (existingData[c.name] ?? '') : ''}" 
+                ${c.pk && existingData ? 'disabled' : ''}
+                placeholder="${c.dflt_value || 'NULL'}">
+        </div>
+    `).join('');
+
+    el('rowModal').classList.remove('hidden');
+}
+
+function editRow(data) {
+    showRowModal(data);
+}
+
+function deleteRow(rowid) {
+    const { db, table, apiKey } = currentActive;
+    showConfirm("Delete Row", "Are you sure you want to delete this row?", async () => {
+        try {
+            const res = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ database: db, sql: `DELETE FROM "${table}" WHERE rowid = ${rowid}` })
+            });
+            const d = await res.json();
+            if (d.success) refreshTableData();
+            else alert("Delete failed: " + d.error);
+        } catch (e) { alert(e.message); }
+    });
+}
+
+async function submitRow() {
+    const { db, table, apiKey } = currentActive;
+    const inputs = Array.from(document.querySelectorAll('.row-input'));
+    const data = {};
+    inputs.forEach(input => {
+        const col = input.getAttribute('data-col');
+        data[col] = input.value;
+    });
+
+    let sql = "";
+    if (editingRowId) {
+        const sets = Object.keys(data).map(k => `"${k}" = ?`).join(', ');
+        sql = `UPDATE "${table}" SET ${sets} WHERE rowid = ${editingRowId}`;
+    } else {
+        const cols = Object.keys(data).map(k => `"${k}"`).join(', ');
+        const vals = Object.keys(data).map(() => '?').join(', ');
+        sql = `INSERT INTO "${table}" (${cols}) VALUES (${vals})`;
+    }
+
+    try {
+        const res = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ 
+                database: db, 
+                sql: sql, 
+                params: Object.values(data) 
+            })
+        });
+        const d = await res.json();
+        if (d.success) {
+            el('rowModal').classList.add('hidden');
+            refreshTableData();
+        } else alert("Save failed: " + d.error);
+    } catch (e) { alert(e.message); }
 }
 
 async function runSql() {

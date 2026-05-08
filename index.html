@@ -120,6 +120,10 @@
                         <div class="flex items-center gap-3">
                             <h2 id="tableTitle" class="text-2xl font-extrabold text-slate-900 tracking-tight"></h2>
                             <span class="px-2 py-0.5 bg-slate-100 text-slate-400 text-[10px] font-bold uppercase rounded">Table</span>
+                            <button onclick="showRowModal()" class="ml-4 px-3 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-md text-[11px] font-bold hover:bg-emerald-600 hover:text-white transition-all flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                INSERT ROW
+                            </button>
                         </div>
                         <div class="flex bg-slate-100 p-1 rounded-lg">
                             <button id="tab-data" onclick="switchTableTab('data')" class="px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-white text-slate-900 shadow-sm">Data</button>
@@ -266,6 +270,28 @@
             <div class="p-6 border-t border-slate-50 flex gap-3">
                 <button onclick="el('createTableModal').classList.add('hidden')" class="px-6 py-2 text-slate-500 font-bold text-xs hover:bg-slate-50 rounded-lg transition-all border border-transparent">Cancel</button>
                 <button onclick="submitCreateTable()" class="flex-1 py-2 btn-primary rounded-lg font-bold text-xs shadow-sm">Save Table</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row Editor Modal -->
+    <div id="rowModal" class="hidden fixed inset-0 z-[100] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center p-6">
+        <div class="w-full max-w-lg bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="p-6 border-b border-slate-50 flex items-center justify-between">
+                <div>
+                    <h3 id="rowModalTitle" class="text-lg font-bold text-slate-900">Insert Row</h3>
+                    <p class="text-xs text-slate-400 font-medium italic">Table: <span id="rowModalTable" class="text-[#3ecf8e]"></span></p>
+                </div>
+                <button onclick="el('rowModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="rowFields" class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+                <!-- Fields injected here -->
+            </div>
+            <div class="p-6 border-t border-slate-50 flex gap-3">
+                <button onclick="el('rowModal').classList.add('hidden')" class="px-6 py-2 text-slate-500 font-bold text-xs hover:bg-slate-50 rounded-lg transition-all border border-transparent">Cancel</button>
+                <button onclick="submitRow()" class="flex-1 py-2 btn-primary rounded-lg font-bold text-xs shadow-sm">Save Data</button>
             </div>
         </div>
     </div>
