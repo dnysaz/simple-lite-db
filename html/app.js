@@ -105,7 +105,7 @@ function switchView(viewId) {
 
 async function showRelationView() {
     const { db, apiKey } = currentActive;
-    if (!db) return alert("Please select a database first.");
+    if (!db) return showNotify("Required", "Please select a database first.", "error");
     
     el('relDbName').innerText = db;
     switchView('view-relation');
@@ -314,8 +314,8 @@ function deleteRow(rowid) {
             });
             const d = await res.json();
             if (d.success) refreshTableData();
-            else alert("Delete failed: " + d.error);
-        } catch (e) { alert(e.message); }
+            else showNotify("Delete failed", d.error || d.detail, "error");
+        } catch (e) { showNotify("Error", e.message, "error"); }
     });
 }
 
@@ -352,14 +352,15 @@ async function submitRow() {
         if (d.success) {
             el('rowModal').classList.add('hidden');
             refreshTableData();
-        } else alert("Save failed: " + d.error);
-    } catch (e) { alert(e.message); }
+            showNotify("Success", "Row saved successfully!");
+        } else showNotify("Save failed", d.error || d.detail, "error");
+    } catch (e) { showNotify("Error", e.message, "error"); }
 }
 
 async function runSql() {
     const sql = el('sqlInput').value;
     const { db, apiKey } = currentActive;
-    if (!db) return alert("Please select a database from the sidebar.");
+    if (!db) return showNotify("Required", "Please select a database from the sidebar.", "error");
     try {
         const res = await fetch('/query', {
             method: 'POST',
@@ -372,13 +373,13 @@ async function runSql() {
         el('sqlResult').innerHTML = '<div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead id="sthead"></thead><tbody id="stbody" class="divide-y divide-slate-50"></tbody></table></div>';
         renderGrid(data.rows, el('sthead'), el('stbody'));
         if (sql.toUpperCase().match(/CREATE|DROP|ALTER/)) loadAllDatabases();
-    } catch (err) { alert("SQL Error: " + err.message); }
+    } catch (err) { showNotify("SQL Error", err.message, "error"); }
 }
 
 // --- 5. API Documentation Page ---
 function showApiView() {
     const { db, table, apiKey } = currentActive;
-    if (!db) return alert("Please select a database first.");
+    if (!db) return showNotify("Required", "Please select a database first.", "error");
     const baseUrl = window.location.origin;
     
     switchView('view-api');
@@ -611,7 +612,25 @@ function switchBackFromApi() {
     switchView(lastView);
 }
 
-// --- 6. Confirmation Logic ---
+// --- 6. Notification & Confirmation ---
+function showNotify(title, text, type = 'success') {
+    const iconEl = el('notifyIcon');
+    const modalEl = el('notifyModal');
+    
+    el('notifyTitle').innerText = title;
+    el('notifyText').innerText = text;
+    
+    if (type === 'success') {
+        iconEl.className = "w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6";
+        iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+        iconEl.className = "w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6";
+        iconEl.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+    }
+    
+    modalEl.classList.remove('hidden');
+}
+
 function showConfirm(title, text, onConfirm) {
     el('confirmTitle').innerText = title;
     el('confirmText').innerText = text;
@@ -628,7 +647,7 @@ async function submitAddColumn() {
     const colType = el('addColType').value;
     const { db, table, apiKey } = currentActive;
 
-    if (!colName) return alert("Column name is required.");
+    if (!colName) return showNotify("Required", "Column name is required.", "error");
 
     const sql = `ALTER TABLE "${table}" ADD COLUMN ${colName} ${colType}`;
     try {
@@ -641,9 +660,9 @@ async function submitAddColumn() {
         if (data.success) {
             el('addColName').value = '';
             refreshTableData();
-            alert("Column added successfully!");
-        } else alert("Error: " + data.error);
-    } catch (err) { alert(err.message); }
+            showNotify("Success", "Column added successfully!");
+        } else showNotify("Error", data.error || data.detail || "Failed to add column", "error");
+    } catch (err) { showNotify("System Error", err.message, "error"); }
 }
 
 function confirmDeleteTable() {
@@ -664,8 +683,9 @@ function confirmDeleteTable() {
                     currentActive.table = '';
                     loadAllDatabases();
                     switchView('view-welcome');
-                } else alert("Error: " + data.error);
-            } catch (err) { alert(err.message); }
+                    showNotify("Success", "Table dropped.");
+                } else showNotify("Error", data.error || data.detail, "error");
+            } catch (err) { showNotify("Error", err.message, "error"); }
         }
     );
 }
@@ -686,8 +706,9 @@ function confirmDeleteDb(name) {
                     if (currentActive.db === name) currentActive = { db: '', table: '', apiKey: '' };
                     loadAllDatabases();
                     switchView('view-welcome');
-                } else alert("Error: " + data.error);
-            } catch (err) { alert(err.message); }
+                    showNotify("Success", "Database deleted.");
+                } else showNotify("Error", data.error || data.detail, "error");
+            } catch (err) { showNotify("Error", err.message, "error"); }
         }
     );
 }
@@ -701,7 +722,7 @@ function showCreateDb() {
 
 async function submitCreateDb() {
     const name = el('newDbName').value.trim();
-    if (!name) return alert("Database name is required.");
+    if (!name) return showNotify("Required", "Database name is required.", "error");
     try {
         const res = await fetch('/admin/create_db', {
             method: 'POST',
@@ -712,8 +733,9 @@ async function submitCreateDb() {
         if (data.success) {
             el('createDbModal').classList.add('hidden');
             loadAllDatabases();
-        } else alert("Creation error: " + data.error);
-    } catch (err) { alert(err.message); }
+            showNotify("Success", `Database '${name}' created.`);
+        } else showNotify("Error", data.error || data.detail, "error");
+    } catch (err) { showNotify("Error", err.message, "error"); }
 }
 
 function showCreateTable(db, apiKey) {
@@ -760,10 +782,10 @@ function addColumnRow(name = '', type = 'TEXT', pk = false, nullable = true) {
 
 async function submitCreateTable() {
     const tableName = el('newTableName').value.trim();
-    if (!tableName) return alert("Please enter a table name.");
+    if (!tableName) return showNotify("Required", "Please enter a table name.", "error");
 
     const rows = Array.from(el('columnList').querySelectorAll('tr'));
-    if (rows.length === 0) return alert("Please add at least one column.");
+    if (rows.length === 0) return showNotify("Required", "Please add at least one column.", "error");
 
     const columnDefs = rows.map(tr => {
         const name = tr.querySelector('.col-name').value.trim();
@@ -781,7 +803,7 @@ async function submitCreateTable() {
         return def;
     }).filter(d => d !== null);
 
-    if (columnDefs.length === 0) return alert("Please provide names for your columns.");
+    if (columnDefs.length === 0) return showNotify("Required", "Please provide names for your columns.", "error");
 
     const sql = `CREATE TABLE "${tableName}" (\n  ${columnDefs.join(',\n  ')}\n)`;
     
@@ -797,10 +819,11 @@ async function submitCreateTable() {
             el('createTableModal').classList.add('hidden');
             loadAllDatabases();
             showTable(db, tableName, apiKey);
+            showNotify("Success", `Table '${tableName}' created.`);
         } else {
-            alert("Create Table Error: " + data.error);
+            showNotify("Create Table Error", data.error || data.detail || "Check your schema definition.", "error");
         }
     } catch (err) {
-        alert("Failed to create table: " + err.message);
+        showNotify("Failed", err.message, "error");
     }
 }

@@ -287,6 +287,16 @@
         </div>
     </div>
 
+    <!-- Notification Modal (Success/Error) -->
+    <div id="notifyModal" class="hidden fixed inset-0 z-[120] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center p-6">
+        <div class="w-full max-w-sm bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 p-8 text-center animate-in zoom-in duration-200">
+            <div id="notifyIcon" class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"></div>
+            <h3 id="notifyTitle" class="text-lg font-bold text-slate-900 mb-2"></h3>
+            <p id="notifyText" class="text-sm text-slate-500 mb-8 font-medium"></p>
+            <button onclick="el('notifyModal').classList.add('hidden')" class="w-full py-2.5 bg-slate-900 text-white rounded-lg font-bold text-xs shadow-sm hover:bg-slate-800 transition-all">Dismiss</button>
+        </div>
+    </div>
+
     <!-- Row Editor Modal -->
     <div id="rowModal" class="hidden fixed inset-0 z-[100] bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center p-6">
         <div class="w-full max-w-lg bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-slate-100 flex flex-col max-h-[85vh]">
