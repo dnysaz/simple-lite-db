@@ -333,7 +333,7 @@ async function showRowModal(existingData = null) {
     const { db, table, apiKey } = currentActive;
     el('rowModalTable').innerText = table;
     el('rowModalTitle').innerText = existingData ? 'Edit Row' : 'Insert Row';
-    editingRowId = existingData ? existingData.rowid : null;
+    editingRowId = existingData ? existingData._rowid_ : null;
 
     // Get columns
     const res = await fetch('/query', {
