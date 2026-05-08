@@ -95,8 +95,11 @@ async function renderSidebar() {
 
 // --- 4. Views & Actions ---
 function switchView(viewId) {
-    if (viewId !== 'view-api' && viewId !== 'view-relation') lastView = viewId;
-    ['view-welcome', 'view-table', 'view-sql', 'view-api', 'view-relation'].forEach(id => el(id).classList.add('hidden'));
+    if (viewId !== 'view-api' && viewId !== 'view-relation' && viewId !== 'view-terminal') lastView = viewId;
+    ['view-welcome', 'view-table', 'view-sql', 'view-api', 'view-relation', 'view-terminal'].forEach(id => {
+        const item = el(id);
+        if (item) item.classList.add('hidden');
+    });
     el(viewId).classList.remove('hidden');
     
     // Toggle Top Action Bar
@@ -107,10 +110,12 @@ function switchView(viewId) {
     }
 
     document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-    if (viewId === 'view-welcome') document.querySelectorAll('.nav-link')[0].classList.add('active');
-    if (viewId === 'view-sql') document.querySelectorAll('.nav-link')[1].classList.add('active');
-    if (viewId === 'view-relation') document.querySelectorAll('.nav-link')[2].classList.add('active');
-    if (viewId === 'view-api') document.querySelectorAll('.nav-link')[3].classList.add('active');
+    const navs = document.querySelectorAll('.nav-link');
+    if (viewId === 'view-welcome' && navs[0]) navs[0].classList.add('active');
+    if (viewId === 'view-sql' && navs[1]) navs[1].classList.add('active');
+    if (viewId === 'view-relation' && navs[2]) navs[2].classList.add('active');
+    if (viewId === 'view-terminal' && navs[3]) navs[3].classList.add('active');
+    if (viewId === 'view-api' && navs[4]) navs[4].classList.add('active');
 }
 
 async function showRelationView() {
