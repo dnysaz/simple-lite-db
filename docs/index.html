@@ -11,6 +11,7 @@
         .bg-grid { background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 32px 32px; }
         .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.6); }
         .gradient-text { background: linear-gradient(135deg, #059669 0%, #3ecf8e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        code { font-family: 'Fira Code', monospace; }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800">
@@ -31,17 +32,17 @@
                 </div>
             </nav>
 
-            <div class="max-w-3xl">
+            <div class="max-w-4xl">
                 <h1 class="text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1] mb-6">
-                    The Smart Way to <span class="gradient-text">Manage SQLite</span> over HTTP.
+                    SQLite for <span class="gradient-text">Serverless Era</span> via HTTP.
                 </h1>
                 <p class="text-xl text-slate-500 font-medium leading-relaxed mb-10">
-                    A powerful, lightweight, and modern management suite for SQLite. SimpleLiteDB transforms your local database into a robust HTTP service with a premium web dashboard.
+                    A powerful, lightweight database bridge that transforms your local SQLite databases into a robust HTTP API. Perfect for modern web apps, IoT, and serverless environments.
                 </p>
                 <div class="flex flex-wrap gap-4">
                     <div class="px-4 py-2 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center gap-2">
                         <span class="w-2 h-2 bg-[#3ecf8e] rounded-full animate-pulse"></span>
-                        <span class="text-xs font-bold text-slate-600 uppercase tracking-widest">Active Engine: v2.0.0</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-widest">Version 2.1.0 (Stable)</span>
                     </div>
                 </div>
             </div>
@@ -57,14 +58,14 @@
                 <div class="glass-card p-6 rounded-2xl sticky top-8">
                     <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">Introduction</h4>
                     <ul class="space-y-4">
-                        <li><a href="#what" class="text-sm font-bold text-emerald-600 flex items-center gap-2"><span>Apa itu SimpleLiteDB?</span></a></li>
-                        <li><a href="#why" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Kenapa Dibuat?</a></li>
-                        <li><a href="#for" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Untuk Apa?</a></li>
+                        <li><a href="#what" class="text-sm font-bold text-emerald-600 flex items-center gap-2"><span>What is SimpleLiteDB?</span></a></li>
+                        <li><a href="#why" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Why use it?</a></li>
+                        <li><a href="#serverless" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Serverless Support</a></li>
                     </ul>
-                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-10 mb-6">Getting Started</h4>
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-10 mb-6">Implementation</h4>
                     <ul class="space-y-4">
-                        <li><a href="#setup" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Cara Instalasi</a></li>
-                        <li><a href="#api" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Menggunakan API</a></li>
+                        <li><a href="#setup" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Quick Setup</a></li>
+                        <li><a href="#api" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">API Code Examples</a></li>
                     </ul>
                 </div>
             </aside>
@@ -74,53 +75,43 @@
                 
                 <!-- What -->
                 <section id="what" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Apa itu SimpleLiteDB?</h2>
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">What is SimpleLiteDB?</h2>
                     <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4">
-                        <p>SimpleLiteDB adalah <strong>Database Management Suite</strong> berbasis web yang dirancang khusus untuk SQLite. Aplikasi ini bertindak sebagai jembatan (bridge) yang mengubah database SQLite lokal Anda menjadi layanan HTTP yang bisa diakses dari mana saja secara aman.</p>
-                        <p>Bukan sekadar penampil data biasa, SimpleLiteDB menyediakan antarmuka modern (Dashboard), Terminal interaktif, dan Visualisasi Relasi (Schema Map) dalam satu paket ringan.</p>
+                        <p>SimpleLiteDB is a <strong>Database Management Suite</strong> specifically designed for SQLite. It acts as a secure bridge that turns your local SQLite files into a multi-tenant HTTP service accessible from anywhere.</p>
+                        <p>With an integrated Admin Dashboard, Interactive Schema Map, and Web Terminal, it provides a "Cloud Database" experience while keeping the simplicity and cost-efficiency of SQLite.</p>
                     </div>
                 </section>
 
                 <!-- Why -->
                 <section id="why" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Kenapa Dibuat?</h2>
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Why use it?</h2>
                     <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4">
-                        <p>Banyak developer menghadapi masalah saat ingin menggunakan SQLite di lingkungan remote (VPS) atau ingin membagikan akses database tanpa memberikan akses SSH penuh.</p>
-                        <p>SimpleLiteDB dibuat untuk:</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li><strong>Menghilangkan Kerumitan</strong>: Tidak perlu menginstal software client database yang berat.</li>
-                            <li><strong>Aksesibilitas</strong>: Mengelola database cukup melalui browser.</li>
-                            <li><strong>Modernisasi</strong>: Memberikan pengalaman manajemen database ala SaaS (seperti Supabase atau PlanetScale) namun untuk SQLite yang jauh lebih hemat sumber daya.</li>
+                        <p>Native SQLite is great, but it lacks remote access and multi-user capabilities. SimpleLiteDB solves this by providing:</p>
+                        <ul class="list-disc pl-5 space-y-2 font-medium">
+                            <li><strong>Remote Management</strong>: Manage your databases via browser without SSH.</li>
+                            <li><strong>Multi-Tenancy</strong>: Create multiple isolated databases, each with its own API Key.</li>
+                            <li><strong>Zero Dependencies</strong>: No need for complex SQL drivers in your frontend or serverless functions.</li>
                         </ul>
                     </div>
                 </section>
 
-                <!-- For What -->
-                <section id="for" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Untuk Apa?</h2>
-                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-4 text-sm bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                            <div class="space-y-3">
-                                <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                                </div>
-                                <h3 class="font-bold text-slate-900 text-base">Backend Sederhana</h3>
-                                <p>Sangat cocok untuk aplikasi web kecil, IoT, atau aplikasi mobile yang butuh database cloud tanpa ribet.</p>
-                            </div>
-                            <div class="space-y-3">
-                                <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                                </div>
-                                <h3 class="font-bold text-slate-900 text-base">Shared Access</h3>
-                                <p>Berbagi akses database ke tim melalui API Key unik per database tanpa resiko keamanan sistem.</p>
-                            </div>
+                <!-- Serverless -->
+                <section id="serverless" class="scroll-mt-10">
+                    <div class="bg-emerald-50 rounded-3xl p-8 border border-emerald-100 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-8 opacity-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v8"/><path d="m4.93 4.93 4.24 4.24"/><path d="M2 12h8"/><path d="m4.93 19.07 4.24-4.24"/><path d="M12 22v-8"/><path d="m19.07 19.07-4.24-4.24"/><path d="M22 12h-8"/><path d="m19.07 4.93-4.24 4.24"/></svg>
+                        </div>
+                        <h2 class="text-2xl font-black text-emerald-900 mb-4">Perfect for Serverless (Vercel, Netlify)</h2>
+                        <div class="prose prose-emerald leading-relaxed text-emerald-700 space-y-4 text-sm max-w-lg">
+                            <p>Modern platforms like <strong>Vercel, Netlify, or Cloudflare Workers</strong> don't allow local SQLite file writes because of their read-only file systems. </p>
+                            <p><strong>SimpleLiteDB</strong> enables you to use SQLite in these environments by hosting the database on a VPS and accessing it via standard HTTP requests. You get the speed of SQLite with the global reach of Serverless.</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- Setup -->
                 <section id="setup" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Cara Instalasi</h2>
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">Quick Setup</h2>
                     <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl overflow-hidden relative">
                         <div class="flex gap-1.5 mb-6">
                             <div class="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -131,21 +122,66 @@
 <span class="text-slate-500"># 1. Clone repository</span>
 git clone https://github.com/dnysaz/simple-lite-db
 
-<span class="text-slate-500"># 2. Inisialisasi Environment</span>
+<span class="text-slate-500"># 2. Initialize Environment</span>
 ./slite init
 
-<span class="text-slate-500"># 3. Jalankan Service</span>
+<span class="text-slate-500"># 3. Start Database Service</span>
 ./slite start db</pre>
                     </div>
                 </section>
 
                 <!-- API -->
                 <section id="api" class="scroll-mt-10">
-                    <h2 class="text-3xl font-black text-slate-900 mb-6">Menggunakan API</h2>
-                    <div class="prose prose-slate leading-relaxed text-slate-600 space-y-6">
-                        <p>Setelah database dibuat, Anda bisa langsung memanggilnya dari aplikasi apapun menggunakan request HTTP POST sederhana.</p>
-                        <div class="p-6 bg-white rounded-2xl border border-slate-100 italic text-slate-500 text-sm">
-                            "Bawa SQLite ke level Cloud dengan satu baris kode."
+                    <h2 class="text-3xl font-black text-slate-900 mb-6">API Code Examples</h2>
+                    <div class="space-y-6">
+                        <p class="text-slate-500 text-sm">Query your database from any application using standard fetch requests.</p>
+                        
+                        <!-- JavaScript Example -->
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                            <div class="px-5 py-3 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">JavaScript (Fetch)</span>
+                            </div>
+                            <div class="p-6 overflow-x-auto bg-[#1e293b]">
+                                <pre class="text-slate-300 text-xs leading-relaxed">
+<span class="text-emerald-400">const</span> response = <span class="text-emerald-400">await</span> fetch(<span class="text-amber-200">'http://YOUR_VPS_IP:5117/query'</span>, {
+    method: <span class="text-amber-200">'POST'</span>,
+    headers: {
+        <span class="text-amber-200">'Content-Type'</span>: <span class="text-amber-200">'application/json'</span>,
+        <span class="text-amber-200">'Authorization'</span>: <span class="text-amber-200">'Bearer YOUR_API_KEY'</span>
+    },
+    body: JSON.stringify({
+        database: <span class="text-amber-200">'my_db'</span>,
+        sql: <span class="text-amber-200">'SELECT * FROM users WHERE active = ?'</span>,
+        params: [<span class="text-emerald-400">true</span>]
+    })
+});
+
+<span class="text-emerald-400">const</span> data = <span class="text-emerald-400">await</span> response.json();
+console.log(data.rows);</pre>
+                            </div>
+                        </div>
+
+                        <!-- Python Example -->
+                        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                            <div class="px-5 py-3 border-b border-slate-50 bg-slate-50/50 flex items-center justify-between">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Python (requests)</span>
+                            </div>
+                            <div class="p-6 overflow-x-auto bg-[#1e293b]">
+                                <pre class="text-slate-300 text-xs leading-relaxed">
+<span class="text-emerald-400">import</span> requests
+
+url = <span class="text-amber-200">"http://YOUR_VPS_IP:5117/query"</span>
+headers = {
+    <span class="text-amber-200">"Authorization"</span>: <span class="text-amber-200">"Bearer YOUR_API_KEY"</span>
+}
+payload = {
+    <span class="text-amber-200">"database"</span>: <span class="text-amber-200">"my_db"</span>,
+    <span class="text-amber-200">"sql"</span>: <span class="text-amber-200">"SELECT * FROM users"</span>
+}
+
+res = requests.post(url, json=payload, headers=headers)
+print(res.json()[<span class="text-amber-200">'rows'</span>])</pre>
+                            </div>
                         </div>
                     </div>
                 </section>
