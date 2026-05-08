@@ -222,12 +222,15 @@ async function showRelationView() {
             const panZoom = svgPanZoom(svg, {
                 zoomEnabled: true,
                 controlIconsEnabled: true,
-                fit: true,
+                fit: false,
                 center: true,
                 minZoom: 0.1,
                 maxZoom: 20,
                 refreshRate: 'auto'
             });
+
+            panZoom.zoom(1.0); // Set natural zoom by default
+            panZoom.center();
 
             // Re-fit on window resize
             window.addEventListener('resize', () => panZoom.resize());
