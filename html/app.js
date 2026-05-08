@@ -193,7 +193,55 @@ function switchTableTab(tab) {
         el('tab-data').className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-slate-400 hover:text-slate-600";
         el('table-settings-content').classList.remove('hidden');
         el('table-data-content').classList.add('hidden');
+        loadColumnSettings();
     }
+}
+
+async function loadColumnSettings() {
+    const { db, table, apiKey } = currentActive;
+    try {
+        const res = await fetch('/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+            body: JSON.stringify({ database: db, sql: `PRAGMA table_info("${table}")` })
+        });
+        const data = await res.json();
+        const cols = data.rows || [];
+        
+        el('columnManagementList').innerHTML = cols.map(c => `
+            <div class="flex items-center justify-between py-3 border-b border-slate-50 last:border-0">
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full ${c.pk ? 'bg-[#3ecf8e]' : 'bg-slate-200'}"></span>
+                    <span class="text-sm font-medium text-slate-700">${c.name}</span>
+                    <span class="text-[10px] text-slate-400 font-mono">(${c.type})</span>
+                </div>
+                <button onclick="deleteColumn('${c.name}')" class="p-1.5 text-slate-300 hover:text-red-500 transition-colors" title="Delete Column">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
+}
+
+async function deleteColumn(colName) {
+    const { db, table, apiKey } = currentActive;
+    showConfirm("Delete Column", `Are you sure you want to delete column '${colName}'? This action is permanent.`, async () => {
+        try {
+            const res = await fetch('/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                body: JSON.stringify({ database: db, sql: `ALTER TABLE "${table}" DROP COLUMN "${colName}"` })
+            });
+            const d = await res.json();
+            if (d.success) {
+                showNotify("Success", `Column '${colName}' deleted.`);
+                loadColumnSettings();
+                refreshTableData();
+            } else {
+                showNotify("Delete failed", d.error || d.detail, "error");
+            }
+        } catch (e) { showNotify("Error", e.message, "error"); }
+    });
 }
 
 async function showTable(db, table, apiKey) {
@@ -223,7 +271,7 @@ async function refreshTableData() {
         const res = await fetch('/query', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            body: JSON.stringify({ database: db, sql: `SELECT rowid, * FROM "${table}" LIMIT 100` })
+            body: JSON.stringify({ database: db, sql: `SELECT rowid AS _rowid_, * FROM "${table}" LIMIT 100` })
         });
         const data = await res.json();
         
@@ -231,7 +279,7 @@ async function refreshTableData() {
         let cols = [];
 
         if (rows.length > 0) {
-            cols = Object.keys(rows[0]).filter(k => k !== 'rowid');
+            cols = Object.keys(rows[0]).filter(k => k !== '_rowid_');
         } else {
             // If empty, fetch column names via PRAGMA
             const schemaRes = await fetch('/query', {
@@ -269,7 +317,7 @@ function renderGrid(rows, cols, thead, tbody) {
                     <button onclick='editRow(${JSON.stringify(r).replace(/'/g, "&apos;")})' class="p-1 text-slate-400 hover:text-blue-600" title="Edit">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
-                    <button onclick="deleteRow(${r.rowid})" class="p-1 text-slate-400 hover:text-red-600" title="Delete">
+                    <button onclick="deleteRow(${r._rowid_})" class="p-1 text-slate-400 hover:text-red-600" title="Delete">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                     </button>
                 </div>
@@ -330,7 +378,7 @@ function deleteRow(rowid) {
             const res = await fetch('/query', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({ database: db, sql: `DELETE FROM "${table}" WHERE rowid = ${rowid}` })
+                body: JSON.stringify({ database: db, sql: `DELETE FROM "${table}" WHERE rowid = ?`, params: [rowid] })
             });
             const d = await res.json();
             if (d.success) refreshTableData();
