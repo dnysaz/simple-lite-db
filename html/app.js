@@ -385,14 +385,6 @@ async function submitRow() {
         } else showNotify("Save failed", d.error || d.detail, "error");
     } catch (e) { showNotify("Error", e.message, "error"); }
 }
-        const d = await res.json();
-        if (d.success) {
-            el('rowModal').classList.add('hidden');
-            refreshTableData();
-            showNotify("Success", "Row saved successfully!");
-        } else showNotify("Save failed", d.error || d.detail, "error");
-    } catch (e) { showNotify("Error", e.message, "error"); }
-}
 
 async function runSql() {
     const sql = el('sqlInput').value;
