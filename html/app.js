@@ -342,46 +342,49 @@ function deleteRow(rowid) {
 async function submitRow() {
     const { db, table, apiKey } = currentActive;
     const inputs = Array.from(document.querySelectorAll('.row-input'));
-    const data = {};
+    const updateData = {};
+    const insertData = {};
     
-    // Only collect data from enabled inputs to avoid updating PKs
     inputs.forEach(input => {
+        const col = input.getAttribute('data-col');
         if (!input.disabled) {
-            const col = input.getAttribute('data-col');
-            data[col] = input.value;
+            updateData[col] = input.value;
         }
+        insertData[col] = input.value;
     });
 
     let sql = "";
-    if (editingRowId) {
-        if (Object.keys(data).length === 0) return el('rowModal').classList.add('hidden');
-        const sets = Object.keys(data).map(k => `"${k}" = ?`).join(', ');
-        sql = `UPDATE "${table}" SET ${sets} WHERE rowid = ${editingRowId}`;
+    let params = [];
+
+    if (editingRowId !== null) {
+        // UPDATE MODE
+        const sets = Object.keys(updateData).map(k => `"${k}" = ?`).join(', ');
+        if (!sets) return el('rowModal').classList.add('hidden');
+        sql = `UPDATE "${table}" SET ${sets} WHERE rowid = ?`;
+        params = [...Object.values(updateData), editingRowId];
     } else {
-        // For INSERT, we also skip disabled (PK) columns so SQLite handles AUTOINCREMENT
-        const insertData = {};
-        inputs.forEach(input => {
-            if (!input.disabled) {
-                const col = input.getAttribute('data-col');
-                insertData[col] = input.value;
-            }
-        });
+        // INSERT MODE
         const cols = Object.keys(insertData).map(k => `"${k}"`).join(', ');
         const vals = Object.keys(insertData).map(() => '?').join(', ');
         sql = `INSERT INTO "${table}" (${cols}) VALUES (${vals})`;
-        data.values = Object.values(insertData);
+        params = Object.values(insertData);
     }
 
     try {
         const res = await fetch('/query', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-            body: JSON.stringify({ 
-                database: db, 
-                sql: sql, 
-                params: editingRowId ? Object.values(data) : data.values 
-            })
+            body: JSON.stringify({ database: db, sql, params })
         });
+        const d = await res.json();
+        if (d.success) {
+            el('rowModal').classList.add('hidden');
+            refreshTableData();
+            showNotify("Success", editingRowId !== null ? "Row updated!" : "Row inserted!");
+            editingRowId = null; // Reset
+        } else showNotify("Save failed", d.error || d.detail, "error");
+    } catch (e) { showNotify("Error", e.message, "error"); }
+}
         const d = await res.json();
         if (d.success) {
             el('rowModal').classList.add('hidden');
