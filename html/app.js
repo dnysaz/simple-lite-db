@@ -175,7 +175,12 @@ function showApiView() {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Endpoint URL</span>
-                <code class="text-indigo-600 font-mono text-xs break-all">${baseUrl}/query</code>
+                <div class="flex items-center justify-between">
+                    <code class="text-indigo-600 font-mono text-xs break-all">${baseUrl}/query</code>
+                    <button onclick="copyCode(this, '${baseUrl}/query')" class="text-slate-400 hover:text-[#3ecf8e] transition-colors ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </div>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Target Database</span>
@@ -183,16 +188,29 @@ function showApiView() {
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-xl shadow-sm">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Authorization</span>
-                <code class="text-slate-900 font-mono text-xs break-all">Bearer ${apiKey}</code>
+                <div class="flex items-center justify-between">
+                    <code class="text-slate-900 font-mono text-xs break-all">Bearer ${apiKey}</code>
+                    <button onclick="copyCode(this, 'Bearer ${apiKey}')" class="text-slate-400 hover:text-[#3ecf8e] transition-colors ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div class="space-y-12 pt-8 border-t border-slate-50">
+        <div class="space-y-16 pt-12 border-t border-slate-50">
+            <!-- Vanilla JS -->
             <div>
-                <h3 class="text-lg font-bold text-slate-900 mb-4">Vanilla JavaScript</h3>
-                <div class="code-block">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-yellow-400 rounded-full"></span>
+                    Vanilla JavaScript (Fetch)
+                </h3>
+                <div class="code-block group">
                     <span class="code-badge">JS / FETCH</span>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed"><span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
+                    <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        COPY
+                    </button>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
   method: <span class="text-[#475569]">'POST'</span>,
   headers: {
     <span class="text-[#0284c7]">'Content-Type'</span>: <span class="text-[#475569]">'application/json'</span>,
@@ -206,11 +224,19 @@ function showApiView() {
                 </div>
             </div>
 
+            <!-- Next.js -->
             <div>
-                <h3 class="text-lg font-bold text-slate-900 mb-4">Next.js Implementation</h3>
-                <div class="code-block">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-slate-900 rounded-full"></span>
+                    Next.js Implementation (Server Action / Component)
+                </h3>
+                <div class="code-block group">
                     <span class="code-badge">React / Server Side</span>
-                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed"><span class="text-[#2563eb]">const</span> res = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
+                    <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        COPY
+                    </button>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">const</span> res = <span class="text-[#2563eb]">await</span> <span class="text-[#0284c7]">fetch</span>('${baseUrl}/query', {
   method: <span class="text-[#475569]">'POST'</span>,
   headers: {
     <span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">\`Bearer $\{process.env.SLITE_API_KEY\}\`</span>,
@@ -226,12 +252,19 @@ function showApiView() {
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">Python (Requests)</h3>
-                    <div class="code-block">
-                        <span class="code-badge">Python 3</span>
-                        <pre class="text-[#334155] text-[12px] font-mono leading-relaxed"><span class="text-[#2563eb]">import</span> requests
+            <!-- Python -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-blue-500 rounded-full"></span>
+                    Python (Requests)
+                </h3>
+                <div class="code-block group">
+                    <span class="code-badge">Python 3</span>
+                    <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        COPY
+                    </button>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#2563eb]">import</span> requests
 
 res = requests.post('${baseUrl}/query', 
   headers={<span class="text-[#0284c7]">'Authorization'</span>: <span class="text-[#475569]">'Bearer ${apiKey}'</span>},
@@ -241,13 +274,22 @@ res = requests.post('${baseUrl}/query',
   }
 )
 <span class="text-[#0284c7]">print</span>(res.json())</pre>
-                    </div>
                 </div>
-                <div>
-                    <h3 class="text-lg font-bold text-slate-900 mb-4">PHP</h3>
-                    <div class="code-block">
-                        <span class="code-badge">cURL</span>
-                        <pre class="text-[#334155] text-[12px] font-mono leading-relaxed"><span class="text-[#475569]">$ch</span> = curl_init('${baseUrl}/query');
+            </div>
+
+            <!-- PHP -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+                    PHP (cURL)
+                </h3>
+                <div class="code-block group">
+                    <span class="code-badge">PHP / CURL</span>
+                    <button onclick="copyBlock(this)" class="absolute top-10 right-4 p-2 bg-white border border-slate-200 rounded-md text-slate-400 hover:text-[#3ecf8e] opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1.5 text-[10px] font-bold">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        COPY
+                    </button>
+                    <pre class="text-[#334155] text-[13px] font-mono leading-relaxed overflow-x-auto"><span class="text-[#475569]">$ch</span> = curl_init('${baseUrl}/query');
 curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_POSTFIELDS, json_encode([
   <span class="text-[#0284c7]">'database'</span> => <span class="text-[#475569]">'${db}'</span>,
   <span class="text-[#0284c7]">'sql'</span> => <span class="text-[#475569]">'SELECT * FROM ${table || 'table'}'</span>
@@ -258,11 +300,29 @@ curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_HTTPHEADER, [
 ]);
 curl_setopt(<span class="text-[#475569]">$ch</span>, CURLOPT_RETURNTRANSFER, <span class="text-[#2563eb]">true</span>);
 <span class="text-[#475569]">$response</span> = curl_exec(<span class="text-[#475569]">$ch</span>);</pre>
-                    </div>
                 </div>
             </div>
         </div>
     `;
+}
+
+async function copyCode(btn, text) {
+    await navigator.clipboard.writeText(text);
+    const original = btn.innerHTML;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(() => btn.innerHTML = original, 2000);
+}
+
+async function copyBlock(btn) {
+    const pre = btn.parentElement.querySelector('pre');
+    await navigator.clipboard.writeText(pre.innerText);
+    const original = btn.innerHTML;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3ecf8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> COPIED';
+    btn.classList.add('text-[#3ecf8e]', 'border-[#3ecf8e]/30');
+    setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('text-[#3ecf8e]', 'border-[#3ecf8e]/30');
+    }, 2000);
 }
 
 function switchBackFromApi() {
